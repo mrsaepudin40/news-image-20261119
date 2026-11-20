@@ -960,6 +960,18 @@ PINS = [
 ]
 
 
+def _hud_brackets(cv, x, y, w, h, col=GOLD2, L=12, t=2):
+    # Sci-fi HUD corner brackets around a framed image.
+    cv.hline(x, x + L, y, col, t)
+    cv.vline(x, y, y + L, col, t)
+    cv.hline(x + w - L, x + w, y, col, t)
+    cv.vline(x + w, y, y + L, col, t)
+    cv.hline(x, x + L, y + h, col, t)
+    cv.vline(x, y + h - L, y + h, col, t)
+    cv.hline(x + w - L, x + w, y + h, col, t)
+    cv.vline(x + w, y + h - L, y + h, col, t)
+
+
 def _inside_poly(px_, py_, poly):
     # Ray casting: is point (px_, py_) inside polygon poly?
     inside = False
@@ -1209,7 +1221,8 @@ def render():
         lw = LEAD_WIDTHS[i]
         lh = LEAD_HEIGHTS[i]
         lead["art"](cv, lx, 182, lw, lh)
-        cv.rect(lx, 182, lw, lh, MGREY)
+        cv.rect(lx, 182, lw, lh, GOLD)
+        _hud_brackets(cv, lx, 182, lw, lh)
         cv.draw_text(lx, 382, lead["tag"], bold, 10, RED)
         y = 406
         for ln in cv.wrap(bold, lead["title"], 20, lw):
@@ -1232,15 +1245,15 @@ def render():
         cv.fill_rect(fx, fy, 237, 20, feat["colour"])
         cv.draw_text(fx + 118, fy + 15, feat["banner"], bold, 10.5,
                      WHITE, align="center")
-        y = fy + 28
+        y = fy + 31
         for ln in cv.wrap(bold, feat["title"], 12, 221):
             cv.draw_text(fx + 8, y, ln, bold, 12, NAVY)
-            y += 15
-        y = fy + 64
+            y += 16
+        y = fy + 68
         for ln in cv.wrap(reg, feat["deck"], 10, 221):
             cv.draw_text(fx + 8, y, ln, reg, 10, INK)
-            y += 12
-        cv.draw_text(fx + 8, fy + 98, feat["src"], ital, 8, GREY)
+            y += 13
+        cv.draw_text(fx + 8, fy + 97, feat["src"], ital, 8, GREY)
 
     # ---- medium grid: one row of 5, data chip + icon + title ----
     for idx, med in enumerate(MEDIUMS):
@@ -1255,10 +1268,10 @@ def render():
         tx = mx + 74
         cv.draw_text(tx, my + 32, med["place"], bold, 8.5,
                      REGION_COL[med["region"]])
-        y = my + 46
+        y = my + 50
         for ln in cv.wrap(bold, med["title"], 11, 106):
             cv.draw_text(tx, y, ln, bold, 11, INK)
-            y += 13
+            y += 15
 
     # ---- map + also list ----
     cv.draw_text(26, 768, "WHERE IT HAPPENED", bold, 13, NAVY)
