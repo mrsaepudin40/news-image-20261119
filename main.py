@@ -1211,31 +1211,32 @@ FEATURED = [
      "src": "Reuters — 19 Nov 2026"},
 ]
 
+# Each item is (bold lead-in — subject / country name —, regular rest).
 ALSO = [
-    "South Florida floods after slow storm",
-    "589m children lived in conflict zones",
-    "Tanzania: Lissu convicted of sedition",
-    "Ethiopia–Eritrea troops mass near Badme",
-    "Iraq orders Kataib Hezbollah out",
-    "Pakistan: 22 militants killed in raids",
-    "Trump pardons Pete Rose posthumously",
-    "US in new Supreme Court bid over TPS",
-    "US jobless claims unexpectedly rise",
-    "Australia jobless rate highest since 2021",
-    "Japan inflation quickens; BOJ eyes hike",
-    "EU, Mexico to scrap 95% of farm tariffs",
-    "Philippines, Chile sign free-trade deal",
-    "Serbia elects Cupic speaker, 140 votes",
-    "Saudi Arabia warns of storms to 24 Nov",
-    "Sánchez admits mistakes in Spain debate",
-    "Brent near flat at $89.72; IEA warns",
-    "South Africa holds repo rate at 7.25%",
-    "Canada eases rules for smaller lenders",
-    "UK, Norway pledge £100m+ for naval craft",
-    "Denmark backs US–Greenland deal, 109–0",
-    "IAEA: North Korea expanded uranium enrichment",
-    "Haiti police kill 34 gang members in raid",
-    "Indonesia passes asset-forfeiture bill",
+    ("South Florida", "floods after slow storm"),
+    ("589m children", "lived in conflict zones"),
+    ("Tanzania:", "Lissu convicted of sedition"),
+    ("Ethiopia–Eritrea", "troops mass near Badme"),
+    ("Iraq", "orders Kataib Hezbollah out"),
+    ("Pakistan:", "22 militants killed in raids"),
+    ("Trump", "pardons Pete Rose posthumously"),
+    ("US", "in new Supreme Court bid over TPS"),
+    ("US jobless claims", "unexpectedly rise"),
+    ("Australia jobless rate", "highest since 2021"),
+    ("Japan inflation", "quickens; BOJ eyes hike"),
+    ("EU, Mexico", "to scrap 95% of farm tariffs"),
+    ("Philippines, Chile", "sign free-trade deal"),
+    ("Serbia", "elects Cupic speaker, 140 votes"),
+    ("Saudi Arabia", "warns of storms to 24 Nov"),
+    ("Sánchez", "admits mistakes in Spain debate"),
+    ("Brent", "near flat at $89.72; IEA warns"),
+    ("South Africa", "holds repo rate at 7.25%"),
+    ("Canada", "eases rules for smaller lenders"),
+    ("UK, Norway", "pledge £100m+ for naval craft"),
+    ("Denmark", "backs US–Greenland deal, 109–0"),
+    ("IAEA:", "N. Korea expanded uranium enrichment"),
+    ("Haiti", "police kill 34 gang members in raid"),
+    ("Indonesia", "passes asset-forfeiture bill"),
 ]
 
 DATE_CHECK = ("DATE CHECK — Left out on purpose: the EU's €45bn Ukraine "
@@ -1378,12 +1379,19 @@ def render():
     cv.rect(26, 782, 470, 100, GOLD, 2)
     cv.draw_text(26, 890, MAP_KEY_1, reg, 8.5, GREY)
     cv.draw_text(26, 902, MAP_KEY_2, reg, 8.5, GREY)
-    for j, item in enumerate(ALSO):
+    # Numbers cycle through four colours; only the subject / country
+    # lead-in is bold, the rest of each headline is regular.
+    NUM_COLOURS = [RED, BLUE, TEAL, PURPLE]
+    for j, (lead, rest) in enumerate(ALSO):
         col, k = (0, j) if j < 12 else (1, j - 12)
         ax = 512 + col * 246
-        ay = 782 + k * 12
-        cv.draw_text(ax, ay, "%d." % (j + 1), bold, 10, RED)
-        cv.draw_text(ax + 20, ay, item, reg, 10, INK)
+        ay = 780 + k * 13
+        cv.draw_text(ax, ay, "%d." % (j + 1), bold, 9.5,
+                     NUM_COLOURS[j % 4])
+        tx = ax + 20
+        cv.draw_text(tx, ay, lead, bold, 9.5, NAVY)
+        lw = cv.text_width(bold, lead, 9.5)
+        cv.draw_text(tx + lw + 4, ay, rest, reg, 9.5, INK)
 
     # ---- date check ----
     cv.fill_rect(26, 928, 972, 48, PAPER)
