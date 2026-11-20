@@ -783,50 +783,57 @@ def art_market(cv, x, y, w, h):
 
 
 def icon_bridge(cv, x, y, s):
-    cv.fill_rect(x, y, s, s, _tint(BLUE))
-    cv.fill_rect(x + 6, y + s - 22, s - 12, 5, NAVY)
-    for tx in (x + 12, x + s - 22):
-        cv.fill_rect(tx, y + 14, 8, s - 32, NAVY)
-    cv.line(x + 8, y + s - 22, x + s // 2, y + 16, NAVY, 2)
-    cv.line(x + s - 8, y + s - 22, x + s // 2, y + 16, NAVY, 2)
-    cv.fill_poly([(x + s // 2 - 9, y + 8), (x + s // 2 + 2, y + 14),
-                  (x + s // 2 - 2, y + 20), (x + s // 2 + 9, y + 12),
-                  (x + s // 2, y + 22), (x + s // 2 - 8, y + 18)], GOLD2)
+    # Futuristic Kerch bridge at night: neon towers and cables, blast
+    # glow at the struck mid-span.
+    cv.fill_rect(x, y, s, s, _DARK)
+    for tx in (x + 12, x + 50):
+        cv.vline(tx, y + 14, y + 44, GOLD2, 2)
+    cv.hline(x + 6, x + s - 6, y + 44, GOLD2, 2)
+    cv.line(x + 12, y + 44, x + 31, y + 30, GOLD2, 1)
+    cv.line(x + 50, y + 44, x + 31, y + 30, GOLD2, 1)
+    cv.line(x + 12, y + 14, x + 31, y + 30, GOLD2, 1)
+    cv.line(x + 50, y + 14, x + 31, y + 30, GOLD2, 1)
+    for wy in (50, 55):
+        cv.hline(x + 6, x + s - 6, y + wy, BLUE, 2)
+    cv.fill_circle(x + 31, y + 26, 9, (255, 120, 40))
+    cv.circle(x + 31, y + 26, 13, RED2, 1)
+    cv.fill_circle(x + 31, y + 26, 4, GOLD2)
 
 
 def icon_capitol(cv, x, y, s):
-    cv.fill_rect(x, y, s, s, _tint(RED2))
+    # Futuristic capitol at night: dome and columns in gold neon, stars.
+    cv.fill_rect(x, y, s, s, _DARK)
+    for (sx, sy) in ((10, 10), (52, 8), (46, 16), (16, 20)):
+        cv.fill_rect(x + sx, y + sy, 2, 2, WHITE)
     cx = x + s // 2
-    cv.ellipse(cx, y + 22, 16, 12, NAVY)
-    cv.fill_rect(cx - 16, y + 22, 32, 8, NAVY)
-    cv.fill_rect(x + 8, y + 30, s - 16, 6, NAVY)
+    cv.ellipse(cx, y + 24, 15, 11, (30, 55, 90))
+    cv.fill_rect(cx - 15, y + 24, 30, 6, (30, 55, 90))
+    cv.fill_rect(x + 10, y + 30, s - 20, 5, (30, 55, 90))
     for i in range(4):
-        cv.fill_rect(x + 12 + i * 12, y + 36, 5, 14, NAVY)
-    cv.fill_rect(x + 8, y + 50, s - 16, 5, NAVY)
-    cv.vline(cx, y + 6, y + 12, NAVY, 2)
+        cv.fill_rect(x + 13 + i * 11, y + 35, 4, 12, GOLD2)
+    cv.fill_rect(x + 8, y + 47, s - 16, 4, (30, 55, 90))
+    cv.vline(cx, y + 8, y + 13, GOLD2, 2)
+    cv.fill_circle(cx, y + 7, 2, GOLD2)
 
 
 def icon_truck(cv, x, y, s):
-    # detailed ambulance: white body with a thick navy outline so it
-    # reads on the pale tint, red cross, red stripe, light bar, blue
-    # windshield, wheels with white hubs
-    cv.fill_rect(x, y, s, s, _tint(ORANGE))
-    cv.fill_rect(x + 12, y + 12, 8, 4, RED2)
-    cv.fill_rect(x + 22, y + 12, 8, 4, BLUE)
-    cv.fill_rect(x + 8, y + 16, 30, 22, WHITE)
-    cv.rect(x + 8, y + 16, 30, 22, NAVY, 2)
-    cv.fill_rect(x + 38, y + 24, 12, 14, WHITE)
-    cv.rect(x + 38, y + 24, 12, 14, NAVY, 2)
-    cv.fill_rect(x + 40, y + 26, 8, 6, (150, 200, 230))
+    # Futuristic aid truck at night: container with glowing cross,
+    # headlight beams, neon outline.
+    cv.fill_rect(x, y, s, s, _DARK)
+    cv.line(x + 50, y + 36, x + 58, y + 30, GOLD2, 1)
+    cv.line(x + 50, y + 40, x + 58, y + 44, GOLD2, 1)
+    cv.fill_rect(x + 8, y + 16, 30, 22, (20, 40, 70))
+    cv.rect(x + 8, y + 16, 30, 22, GOLD2, 1)
+    cv.fill_rect(x + 38, y + 24, 12, 14, (20, 40, 70))
+    cv.rect(x + 38, y + 24, 12, 14, GOLD2, 1)
     cv.fill_rect(x + 20, y + 21, 4, 12, RED2)
     cv.fill_rect(x + 16, y + 25, 12, 4, RED2)
-    cv.fill_rect(x + 8, y + 33, 30, 3, RED2)
-    cv.vline(x + 30, y + 18, y + 33, NAVY, 1)
+    cv.fill_rect(x + 40, y + 26, 8, 6, (150, 200, 230))
+    cv.hline(x + 6, x + s - 6, y + 44, (40, 70, 100), 1)
+    for wx in (17, 43):
+        cv.fill_circle(x + wx, y + 42, 5, INK)
+        cv.fill_circle(x + wx, y + 42, 2, WHITE)
     cv.fill_rect(x + 48, y + 33, 2, 3, GOLD2)
-    cv.fill_circle(x + 17, y + 42, 5, INK)
-    cv.fill_circle(x + 17, y + 42, 2, WHITE)
-    cv.fill_circle(x + 43, y + 42, 5, INK)
-    cv.fill_circle(x + 43, y + 42, 2, WHITE)
 
 
 def icon_ships(cv, x, y, s):
@@ -886,28 +893,38 @@ def icon_parliament(cv, x, y, s):
 
 
 def icon_boat(cv, x, y, s):
-    cv.fill_rect(x, y, s, s, _tint(BLUE))
+    # Futuristic boat at night: glowing hull on neon waves, moon.
+    cv.fill_rect(x, y, s, s, _DARK)
+    cv.fill_circle(x + 48, y + 12, 6, GOLD2)
+    cv.circle(x + 48, y + 12, 9, GOLD2, 1)
     cv.fill_poly([(x + 10, y + 34), (x + 52, y + 34), (x + 46, y + 44),
-                  (x + 16, y + 44)], NAVY)
-    cv.fill_rect(x + 30, y + 16, 3, 18, NAVY)
+                  (x + 16, y + 44)], (20, 40, 70))
+    cv.line(x + 10, y + 34, x + 16, y + 44, GOLD2, 1)
+    cv.line(x + 52, y + 34, x + 46, y + 44, GOLD2, 1)
+    cv.hline(x + 10, x + 52, y + 34, GOLD2, 1)
+    cv.fill_rect(x + 30, y + 16, 3, 18, GOLD2)
     cv.fill_poly([(x + 33, y + 16), (x + 33, y + 30), (x + 45, y + 30)],
                  RED2)
     for wy in (48, 53):
-        cv.hline(x + 6, x + s - 6, y + wy, BLUE, 2)
+        cv.hline(x + 6, x + s - 6, y + wy, (80, 160, 200), 2)
 
 
 def icon_palm(cv, x, y, s):
-    cv.fill_rect(x, y, s, s, _tint(TEAL))
+    # Futuristic El Nino island: blazing sun, palm silhouette, neon sea.
+    cv.fill_rect(x, y, s, s, _DARK)
+    cv.fill_circle(x + 46, y + 12, 7, GOLD2)
+    cv.circle(x + 46, y + 12, 11, RED2, 1)
     cx = x + s // 2
-    cv.fill_circle(x + 48, y + 12, 6, GOLD2)
     cv.fill_poly([(cx - 4, y + 52), (cx - 2, y + 26), (cx + 2, y + 26),
                   (cx + 4, y + 52)], (120, 80, 40))
     for (dx0, dy0, dx1, dy1) in ((-24, 4, -8, -6), (-20, -10, -6, -10),
                                  (24, 4, 8, -6), (20, -10, 6, -10),
                                  (-10, -16, 0, -8), (10, -16, 0, -8)):
         cv.line(cx + dx0, y + 26 + dy0, cx + dx1, y + 26 + dy1, GREEN, 3)
+    cv.fill_poly([(x + 6, y + 54), (x + 22, y + 46), (x + 42, y + 54)],
+                 (30, 55, 50))
     for wy in (54, 58):
-        cv.hline(x + 6, x + s - 6, y + wy, BLUE, 2)
+        cv.hline(x + 6, x + s - 6, y + wy, (80, 160, 200), 2)
 
 
 ICONS = {"bridge": icon_bridge, "capitol": icon_capitol, "truck": icon_truck,
