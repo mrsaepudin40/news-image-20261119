@@ -7,6 +7,10 @@ summing up the world news of Thursday 19 November 2026: 36 stories
 a world map with numbered pins, a four-number stat strip, a DATE CHECK
 box and a source footer. No network, no Pillow, deterministic output.
 
+The summit portrait is a cartoon reference image held in the repo as
+summit.png (380x118) and decoded at run time; every other picture and
+the map are drawn in code.
+
 Every headline was re-verified against reports dated 19 November 2026
 before it was drawn; three stories that broke on Wednesday 18 November
 (EU EUR45bn Ukraine loan, Pew's Muslims-outnumber-Christians projection,
@@ -449,6 +453,20 @@ class Canvas:
             i = (yy * self.w + x0) * 3
             self.px[i:i + len(row)] = row
 
+    def blit(self, x, y, iw, ih, rgb):
+        """Copy raw RGB bytes (iw x ih) onto the canvas at (x, y)."""
+        x0 = max(0, int(x))
+        y0 = max(0, int(y))
+        x1 = min(self.w, int(x + iw))
+        y1 = min(self.h, int(y + ih))
+        if x1 <= x0 or y1 <= y0:
+            return
+        for yy in range(y0, y1):
+            src = ((yy - y) * iw + (x0 - x)) * 3
+            dst = (yy * self.w + x0) * 3
+            n = (x1 - x0) * 3
+            self.px[dst:dst + n] = rgb[src:src + n]
+
     def rect(self, x, y, w, h, col, t=1):
         self.fill_rect(x, y, w, t, col)
         self.fill_rect(x, y + h - t, w, t, col)
@@ -668,91 +686,93 @@ def _bold():
     return _BOLD_CACHE[0]
 
 
-def _star5(cv, cx, cy, r, col):
-    pts = []
-    for k in range(10):
-        ang = -math.pi / 2 + k * math.pi / 5
-        rr = r if k % 2 == 0 else r * 0.42
-        pts.append((cx + rr * math.cos(ang), cy + rr * math.sin(ang)))
-    cv.fill_poly(pts, col)
+def read_png_rgb(path):
+    """Decode an 8-bit non-interlaced PNG (colour types 2 RGB / 6 RGBA)
+    to (width, height, raw RGB bytes). Pure stdlib: struct + zlib."""
+    data = open(path, "rb").read()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("not a PNG file: %s" % path)
+    pos = 8
+    idat = bytearray()
+    w = h = bitdepth = ctype = None
+    while pos < len(data):
+        ln = struct.unpack(">I", data[pos:pos + 4])[0]
+        typ = data[pos + 4:pos + 8]
+        chunk = data[pos + 8:pos + 8 + ln]
+        if typ == b"IHDR":
+            w, h, bitdepth, ctype = struct.unpack(">IIBB", chunk[:10])
+            if bitdepth != 8 or ctype not in (2, 6):
+                raise ValueError("unsupported PNG: depth %d type %d"
+                                 % (bitdepth, ctype))
+            if chunk[10] != 0 or chunk[11] != 0 or chunk[12] != 0:
+                raise ValueError("unsupported PNG: compressed, filtered "
+                                 "or interlaced")
+        elif typ == b"IDAT":
+            idat += chunk
+        elif typ == b"IEND":
+            break
+        pos += 12 + ln
+    raw = zlib.decompress(bytes(idat))
+    ch = 3 if ctype == 2 else 4
+    stride = w * ch
+    out = bytearray(w * h * 3)
+    prev = bytearray(stride)
+    p = 0
+    for yy in range(h):
+        f = raw[p]
+        p += 1
+        line = bytearray(raw[p:p + stride])
+        p += stride
+        if f == 1:
+            for i in range(ch, stride):
+                line[i] = (line[i] + line[i - ch]) & 255
+        elif f == 2:
+            for i in range(stride):
+                line[i] = (line[i] + prev[i]) & 255
+        elif f == 3:
+            for i in range(stride):
+                a = line[i - ch] if i >= ch else 0
+                line[i] = (line[i] + ((a + prev[i]) >> 1)) & 255
+        elif f == 4:
+            for i in range(stride):
+                a = line[i - ch] if i >= ch else 0
+                b = prev[i]
+                c = prev[i - ch] if i >= ch else 0
+                pp = a + b - c
+                pa, pb, pc = abs(pp - a), abs(pp - b), abs(pp - c)
+                pr = a if (pa <= pb and pa <= pc) else (b if pb <= pc else c)
+                line[i] = (line[i] + pr) & 255
+        elif f != 0:
+            raise ValueError("bad PNG filter %d" % f)
+        for xx in range(w):
+            o = (yy * w + xx) * 3
+            s = xx * ch
+            out[o] = line[s]
+            out[o + 1] = line[s + 1]
+            out[o + 2] = line[s + 2]
+        prev = line
+    return w, h, bytes(out)
+
+
+_SUMMIT_PHOTO = [None]
 
 
 def art_summit(cv, x, y, w, h):
-    """The three leaders, standing before their flags — after the
-    reference photo: Trump (US), Xi (China), Putin (Russia)."""
-    SKIN = (232, 190, 150)
-    NAVY_SUIT = (28, 42, 78)
-    DARK = (30, 30, 30)
-    # panelled wall, warm brown like the reference backdrop
-    cv.fill_rect(x, y, w, h, (133, 96, 62))
-    for sx in range(0, w, 52):
-        cv.line(x + sx, y, x + sx, y + h, (110, 78, 48), 2)
-    centres = [x + w // 6, x + w // 2, x + 5 * w // 6]
-    # ---- flags behind each leader ----
-    # US flag: stripes + canton
-    fx0 = centres[0] - 48
-    for s in range(13):
-        if s % 2 == 0:
-            cv.fill_rect(fx0, y + s * 7, 96, 7, (178, 34, 52))
-    cv.fill_rect(fx0, y, 40, 49, (40, 60, 130))
-    for dy in range(6, 49, 10):
-        for dx in range(5, 40, 9):
-            cv.fill_circle(fx0 + dx, y + dy, 2, WHITE)
-    # China flag: red + five gold stars
-    fx1 = centres[1] - 48
-    cv.fill_rect(fx1, y, 96, 92, (222, 32, 32))
-    _star5(cv, fx1 + 20, y + 20, 10, (255, 210, 60))
-    for (sx, sy) in ((42, 12), (52, 22), (50, 34), (40, 40)):
-        _star5(cv, fx1 + sx, y + sy, 4, (255, 210, 60))
-    # Russia flag: white / blue / red bands
-    fx2 = centres[2] - 48
-    cv.fill_rect(fx2, y, 96, 31, WHITE)
-    cv.fill_rect(fx2, y + 31, 96, 31, (0, 70, 170))
-    cv.fill_rect(fx2, y + 62, 96, 30, (210, 30, 30))
-    # ---- three figures ----
-    leaders = [
-        ("TRUMP", (238, 205, 110), (200, 30, 40),
-         [( -25, -6), (-22, -22), (-8, -28), (8, -27), (20, -24),
-          (25, -12), (24, -5), (12, -14), (-6, -15), (-18, -12)]),
-        ("XI", (22, 22, 22), (40, 90, 180),
-         [(-26, -7), (-24, -21), (-10, -27), (10, -27), (24, -21),
-          (26, -7), (12, -13), (-12, -13)]),
-        ("PUTIN", (198, 182, 148), (140, 30, 40),
-         [(-25, -9), (-18, -22), (0, -25), (18, -22), (25, -9),
-          (10, -16), (-10, -16)]),
-    ]
-    for idx, (name, hair_col, tie_col, hair) in enumerate(leaders):
-        cx = centres[idx]
-        hy = y + 48
-        # neck, suit, shirt, tie
-        cv.fill_rect(cx - 9, y + 70, 18, 12, SKIN)
-        cv.fill_poly([(cx - 44, y + h - 16), (cx - 40, y + 80),
-                      (cx + 40, y + 80), (cx + 44, y + h - 16)],
-                     NAVY_SUIT)
-        cv.fill_poly([(cx - 13, y + 80), (cx + 13, y + 80),
-                      (cx, y + 104)], WHITE)
-        cv.fill_poly([(cx - 5, y + 82), (cx + 5, y + 82), (cx + 6, y + 98),
-                      (cx, y + 110), (cx - 6, y + 98)], tie_col)
-        # head, ears, hair, face
-        cv.ellipse(cx - 26, hy - 6, 8, 12, SKIN)
-        cv.ellipse(cx + 26, hy - 6, 8, 12, SKIN)
-        cv.ellipse(cx, hy, 26, 28, SKIN)
-        cv.fill_poly([(cx + dx, hy + dy) for (dx, dy) in hair], hair_col)
-        cv.fill_circle(cx - 9, hy - 2, 2, DARK)
-        cv.fill_circle(cx + 9, hy - 2, 2, DARK)
-        cv.line(cx - 13, hy - 9, cx - 5, hy - 10, DARK, 2)
-        cv.line(cx + 5, hy - 10, cx + 13, hy - 9, DARK, 2)
-        prev = None
-        for k in range(11):
-            dx = -10 + 2 * k
-            py = hy + 12 + (1 - (dx / 10.0) ** 2) * 5
-            pt = (cx + dx, int(py))
-            if prev is not None:
-                cv.line(prev[0], prev[1], pt[0], pt[1], (120, 70, 50), 2)
-            prev = pt
+    """The summit portrait Bos chose: the cartoon of Trump, Xi and
+    Putin before their flags, held in the repo as summit.png (380x118)
+    and decoded at run time; the name band below is drawn in code."""
+    if _SUMMIT_PHOTO[0] is None:
+        here = os.path.dirname(os.path.abspath(__file__))
+        _SUMMIT_PHOTO[0] = read_png_rgb(os.path.join(here, "summit.png"))
+    iw, ih, rgb = _SUMMIT_PHOTO[0]
+    if (iw, ih) != (w, h - 16):
+        raise ValueError("summit.png is %dx%d, expected %dx%d"
+                         % (iw, ih, w, h - 16))
+    cv.blit(x, y, iw, ih, rgb)
     # name band
+    centres = [x + w // 6, x + w // 2, x + 5 * w // 6]
     cv.fill_rect(x, y + h - 16, w, 16, NAVY)
-    for idx, (name, _hc, _tc, _hr) in enumerate(leaders):
+    for idx, name in enumerate(("TRUMP", "XI", "PUTIN")):
         cv.draw_text(centres[idx], y + h - 5, name, _bold(), 10, WHITE,
                      align="center")
 
@@ -1037,7 +1057,8 @@ DATE_CHECK = ("DATE CHECK — Left out on purpose: the EU's €45bn Ukraine "
               "on this page is dated Thursday 19 November 2026.")
 
 FOOTER = ("Sources: Reuters, CNN, WSJ, USA Today, AP, UN News, ReliefWeb, "
-          "OneTurn, Dow Jones/Morningstar. Original drawings — no photos.")
+          "OneTurn, Dow Jones/Morningstar. Summit portrait: cartoon "
+          "reference image; the rest is drawn in code.")
 FOOTER2 = ("Contested claims are attributed. Figures as reported on "
            "Thursday 19 November 2026.")
 
