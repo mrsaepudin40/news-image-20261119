@@ -1106,17 +1106,18 @@ def render():
     cv.fill_rect(0, 0, W, 10, NAVY)
     cv.fill_rect(0, H - 10, W, 10, NAVY)
 
-    # ---- masthead ----
-    cv.draw_text(W // 2, 30, "THE WORLD IN ONE DAY", bold, 13, NAVY,
+    # ---- masthead: dark band, light text ----
+    cv.fill_rect(0, 10, W, 108, NAVY)
+    cv.draw_text(W // 2, 30, "THE WORLD IN ONE DAY", bold, 13, WHITE,
                  align="center", ls=2.0)
-    cv.draw_text(W // 2, 74, "Thursday 19 November 2026", bold, 40, NAVY,
+    cv.draw_text(W // 2, 74, "Thursday 19 November 2026", bold, 40, WHITE,
                  align="center")
     cv.hline(26, 998, 82, GOLD, 2)
-    cv.fill_rect(26, 88, 972, 24, NAVY)
+    cv.fill_rect(26, 88, 972, 24, GOLD)
     cv.draw_text(W // 2, 105,
                  "36 STORIES  ·  EUROPE 7  ·  AMERICAS 8  ·  ASIA-PACIFIC 9  ·  "
                  "MIDDLE EAST 3  ·  AFRICA 4  ·  OCEANIA 3  ·  WORLD 2",
-                 bold, 12, WHITE, align="center")
+                 bold, 12, NAVY, align="center")
 
     # ---- numbers strip ----
     for i, (big, label, col) in enumerate(STATS):
