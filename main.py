@@ -1093,26 +1093,104 @@ MEDIUMS = [
 # story (GTA VI), the climate draft, the cyclone and the Seoul exam.
 # Each gets a data banner, a headline, a deck and a source, the way
 # the day's best front pages feature them.
+_DARK = (10, 26, 58)  # deep navy panel for the futuristic illustrations
+
+
+def feat_gta(cv, x, y, w, h):
+    # Neon Vice City sunset: glowing sun, skyline, palm silhouette.
+    cv.fill_rect(x, y, w, h, _DARK)
+    cv.fill_circle(x + 168, y + 17, 12, GOLD2)
+    cv.circle(x + 168, y + 17, 15, RED2, 1)
+    cv.fill_rect(x, y + 34, w, 2, (180, 80, 160))
+    for (bx, bw, bh) in ((8, 26, 20), (38, 18, 28), (60, 30, 16),
+                         (94, 20, 26), (118, 26, 18), (196, 24, 22)):
+        cv.fill_rect(x + bx, y + h - bh, bw, bh, (6, 14, 34))
+    for (wx, wy) in ((14, 40), (22, 44), (44, 34), (66, 44), (80, 44),
+                     (100, 36), (124, 42), (202, 38), (210, 44)):
+        cv.fill_rect(x + wx, y + wy, 2, 2, GOLD2)
+    cv.line(x + 226, y + 47, x + 226, y + 30, (20, 60, 40), 2)
+    for (dx0, dy0, dx1, dy1) in ((-10, 2, -4, -4), (10, 2, 4, -4),
+                                 (-8, -4, -2, -8), (8, -4, 2, -8)):
+        cv.line(x + 226 + dx0, y + 30 + dy0, x + 226 + dx1, y + 30 + dy1,
+                (30, 90, 60), 2)
+    for wy in (40, 43, 46):
+        cv.hline(x + 156, x + 182, y + wy, GOLD2, 1)
+
+
+def feat_cop(cv, x, y, w, h):
+    # Green globe + wind turbines + sun.
+    cv.fill_rect(x, y, w, h, _DARK)
+    cv.fill_rect(x, y + 44, w, 4, (18, 46, 38))
+    gx, gy = x + 52, y + 26
+    cv.fill_circle(gx, gy, 20, (14, 60, 55))
+    cv.circle(gx, gy, 20, GREEN, 2)
+    cv.circle(gx, gy, 13, GREEN, 1)
+    cv.circle(gx, gy, 6, GREEN, 1)
+    cv.vline(gx, gy - 20, gy + 20, GREEN, 1)
+    cv.hline(gx - 20, gx + 20, gy, GREEN, 1)
+    for tx in (x + 140, x + 185):
+        cv.vline(tx, y + 16, y + 44, (200, 210, 220), 2)
+        cv.fill_circle(tx, y + 16, 2, WHITE)
+        cv.line(tx, y + 16, tx - 8, y + 8, (200, 210, 220), 2)
+        cv.line(tx, y + 16, tx + 8, y + 8, (200, 210, 220), 2)
+        cv.line(tx, y + 16, tx, y + 26, (200, 210, 220), 2)
+    cv.fill_circle(x + w - 14, y + 10, 5, GOLD2)
+
+
+def feat_akvan(cv, x, y, w, h):
+    # Cyclone spiral over a coastline, with rain bands.
+    cv.fill_rect(x, y, w, h, _DARK)
+    cx, cy = x + 62, y + 26
+    cv.circle(cx, cy, 21, TEAL, 2)
+    cv.circle(cx, cy, 15, WHITE, 1)
+    cv.circle(cx, cy, 9, TEAL, 2)
+    cv.fill_circle(cx, cy, 3, GOLD2)
+    for (rx, ry) in ((150, 10), (168, 16), (186, 10), (204, 16), (222, 10)):
+        cv.line(x + rx, y + ry, x + rx - 4, y + ry + 10, (150, 200, 230), 1)
+    cv.fill_poly([(x, y + 48), (x, y + 40), (x + 40, y + 43),
+                  (x + 90, y + 38), (x + 140, y + 42), (x + 190, y + 39),
+                  (x + w, y + 43), (x + w, y + 48)], (45, 62, 52))
+
+
+def feat_suneung(cv, x, y, w, h):
+    # Exam hall: wall clock + rows of desks with glowing screens.
+    cv.fill_rect(x, y, w, h, _DARK)
+    cx, cy = x + 26, y + 18
+    cv.fill_circle(cx, cy, 11, (20, 40, 70))
+    cv.circle(cx, cy, 11, WHITE, 2)
+    cv.line(cx, cy, cx, cy - 7, GOLD2, 2)
+    cv.line(cx, cy, cx + 5, cy + 3, GOLD2, 2)
+    for row in (30, 42):
+        for col in (58, 102, 146, 190):
+            cv.fill_rect(x + col, y + row, 26, 5, (40, 70, 100))
+            cv.fill_rect(x + col + 8, y + row - 8, 10, 7, (140, 210, 255))
+    cv.hline(x, x + w, y + 47, (40, 70, 100), 1)
+
+
+FEAT_IMGS = {"gta": feat_gta, "cop": feat_cop,
+             "akvan": feat_akvan, "suneung": feat_suneung}
+
+
 FEATURED = [
-    {"banner": "GTA VI · 13 YEARS", "colour": PURPLE,
+    {"banner": "GTA VI · 13 YEARS", "colour": PURPLE, "img": "gta",
      "title": "GTA VI out at midnight; NZ first in line",
      "deck": "The sequel 13 years in the making goes on sale at midnight "
-             "— $79.99, New Zealand first.",
+             "— $79.99.",
      "src": "Rockstar · AP — 19 Nov 2026"},
-    {"banner": "COP31 · $120bn CUT", "colour": RED,
+    {"banner": "COP31 · $120bn CUT", "colour": RED, "img": "cop",
      "title": "COP31 draft drops fossil fuels, $120bn goal",
      "deck": "The Antalya draft drops fossil-fuel language and the $120bn "
-             "aid target; talks run to Friday.",
+             "aid target.",
      "src": "Reuters · CNN — 19 Nov 2026"},
-    {"banner": "AKVAN · 50,000 MOVED", "colour": BLUE,
+    {"banner": "AKVAN · 50,000 MOVED", "colour": BLUE, "img": "akvan",
      "title": "Cyclone Akvan nears Odisha; 50,000 moved",
      "deck": "India moves 50,000 people from the Odisha coast as the "
              "cyclone closes in.",
      "src": "Reuters — 19 Nov 2026"},
-    {"banner": "SUNEUNG · 500,000 SIT", "colour": TEAL,
+    {"banner": "SUNEUNG · 500,000 SIT", "colour": TEAL, "img": "suneung",
      "title": "Seoul: half a million sit entrance exam",
-     "deck": "Half a million students sit South Korea's Suneung college "
-             "exam — the year's biggest test.",
+     "deck": "Half a million students sit South Korea's Suneung exam — "
+             "the year's biggest test.",
      "src": "Reuters — 19 Nov 2026"},
 ]
 
@@ -1236,31 +1314,33 @@ def render():
         lx += lw + 10
     cv.hline(26, 998, 516, NAVY, 2)
 
-    # ---- featured row: 4 promoted stories, data banner + deck ----
+    # ---- featured row: 4 promoted stories, data banner + futuristic
+    # illustration + title + deck ----
     for i, feat in enumerate(FEATURED):
         fx = 26 + i * 245
-        fy = 526
-        cv.fill_rect(fx, fy, 237, 104, PAPER)
-        cv.rect(fx, fy, 237, 104, MGREY)
-        cv.fill_rect(fx, fy, 237, 20, feat["colour"])
-        cv.draw_text(fx + 118, fy + 15, feat["banner"], bold, 10.5,
+        fy = 518
+        cv.fill_rect(fx, fy, 237, 140, PAPER)
+        cv.rect(fx, fy, 237, 140, MGREY)
+        cv.fill_rect(fx, fy, 237, 18, feat["colour"])
+        cv.draw_text(fx + 118, fy + 13, feat["banner"], bold, 10,
                      WHITE, align="center")
-        y = fy + 31
-        for ln in cv.wrap(bold, feat["title"], 12, 221):
-            cv.draw_text(fx + 8, y, ln, bold, 12, NAVY)
-            y += 16
-        y = fy + 68
-        for ln in cv.wrap(reg, feat["deck"], 10, 221):
-            cv.draw_text(fx + 8, y, ln, reg, 10, INK)
-            y += 13
-        cv.draw_text(fx + 8, fy + 97, feat["src"], ital, 8, GREY)
+        FEAT_IMGS[feat["img"]](cv, fx, fy + 18, 237, 48)
+        y = fy + 74
+        for ln in cv.wrap(bold, feat["title"], 11.5, 221):
+            cv.draw_text(fx + 8, y, ln, bold, 11.5, NAVY)
+            y += 14
+        y = fy + 102
+        for ln in cv.wrap(reg, feat["deck"], 9.5, 221):
+            cv.draw_text(fx + 8, y, ln, reg, 9.5, INK)
+            y += 12
+        cv.draw_text(fx + 8, fy + 132, feat["src"], ital, 8, GREY)
 
     # ---- medium grid: one row of 5, data chip + icon + title ----
     for idx, med in enumerate(MEDIUMS):
         mx = 26 + idx * 196
-        my = 638
-        cv.fill_rect(mx, my, 186, 100, PAPER)
-        cv.rect(mx, my, 186, 100, MGREY)
+        my = 666
+        cv.fill_rect(mx, my, 186, 86, PAPER)
+        cv.rect(mx, my, 186, 86, MGREY)
         cv.fill_rect(mx, my, 186, 16, REGION_COL[med["region"]])
         cv.draw_text(mx + 93, my + 12, med["data"], bold, 9.5, WHITE,
                      align="center")
@@ -1268,10 +1348,10 @@ def render():
         tx = mx + 74
         cv.draw_text(tx, my + 32, med["place"], bold, 8.5,
                      REGION_COL[med["region"]])
-        y = my + 50
+        y = my + 46
         for ln in cv.wrap(bold, med["title"], 11, 106):
             cv.draw_text(tx, y, ln, bold, 11, INK)
-            y += 15
+            y += 14
 
     # ---- map + also list ----
     cv.draw_text(26, 768, "WHERE IT HAPPENED", bold, 13, NAVY)
