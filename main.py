@@ -1172,8 +1172,8 @@ def render():
         lh = LEAD_HEIGHTS[i]
         lead["art"](cv, lx, 182, lw, lh)
         cv.rect(lx, 182, lw, lh, MGREY)
-        cv.draw_text(lx, 432, lead["tag"], bold, 10, RED)
-        y = 456
+        cv.draw_text(lx, 382, lead["tag"], bold, 10, RED)
+        y = 406
         for ln in cv.wrap(bold, lead["title"], 20, lw):
             cv.draw_text(lx, y, ln, bold, 20, NAVY)
             y += 24
@@ -1183,41 +1183,41 @@ def render():
             y += 14
         cv.draw_text(lx, y + 11, lead["src"], ital, 9, GREY)
         lx += lw + 10
-    cv.hline(26, 998, 566, NAVY, 2)
+    cv.hline(26, 998, 516, NAVY, 2)
 
     # ---- featured row: 4 promoted stories, data banner + deck ----
     for i, feat in enumerate(FEATURED):
         fx = 26 + i * 245
-        fy = 576
-        cv.fill_rect(fx, fy, 237, 84, PAPER)
-        cv.rect(fx, fy, 237, 84, MGREY)
+        fy = 526
+        cv.fill_rect(fx, fy, 237, 104, PAPER)
+        cv.rect(fx, fy, 237, 104, MGREY)
         cv.fill_rect(fx, fy, 237, 20, feat["colour"])
         cv.draw_text(fx + 118, fy + 15, feat["banner"], bold, 10.5,
                      WHITE, align="center")
-        y = fy + 27
+        y = fy + 28
         for ln in cv.wrap(bold, feat["title"], 12, 221):
             cv.draw_text(fx + 8, y, ln, bold, 12, NAVY)
-            y += 14
-        y = fy + 57
+            y += 15
+        y = fy + 64
         for ln in cv.wrap(reg, feat["deck"], 10, 221):
             cv.draw_text(fx + 8, y, ln, reg, 10, INK)
-            y += 11
-        cv.draw_text(fx + 8, fy + 80, feat["src"], ital, 8, GREY)
+            y += 12
+        cv.draw_text(fx + 8, fy + 98, feat["src"], ital, 8, GREY)
 
     # ---- medium grid: one row of 5, data chip + icon + title ----
     for idx, med in enumerate(MEDIUMS):
         mx = 26 + idx * 196
-        my = 666
-        cv.fill_rect(mx, my, 186, 82, PAPER)
-        cv.rect(mx, my, 186, 82, MGREY)
+        my = 638
+        cv.fill_rect(mx, my, 186, 100, PAPER)
+        cv.rect(mx, my, 186, 100, MGREY)
         cv.fill_rect(mx, my, 186, 16, REGION_COL[med["region"]])
         cv.draw_text(mx + 93, my + 12, med["data"], bold, 9.5, WHITE,
                      align="center")
-        ICONS[med["icon"]](cv, mx + 6, my + 18, 62)
+        ICONS[med["icon"]](cv, mx + 6, my + 20, 62)
         tx = mx + 74
-        cv.draw_text(tx, my + 30, med["place"], bold, 8.5,
+        cv.draw_text(tx, my + 32, med["place"], bold, 8.5,
                      REGION_COL[med["region"]])
-        y = my + 42
+        y = my + 46
         for ln in cv.wrap(bold, med["title"], 11, 106):
             cv.draw_text(tx, y, ln, bold, 11, INK)
             y += 13
