@@ -657,33 +657,104 @@ def art_icj(cv, x, y, w, h):
     cv.fill_rect(cx - 14, sy, 28, 4, GOLD)
 
 
+_BOLD_CACHE = [None]
+
+
+def _bold():
+    if _BOLD_CACHE[0] is None:
+        here = os.path.dirname(os.path.abspath(__file__))
+        _BOLD_CACHE[0] = Font(os.path.join(here,
+                                           "LiberationSerif-Bold.ttf"))
+    return _BOLD_CACHE[0]
+
+
+def _star5(cv, cx, cy, r, col):
+    pts = []
+    for k in range(10):
+        ang = -math.pi / 2 + k * math.pi / 5
+        rr = r if k % 2 == 0 else r * 0.42
+        pts.append((cx + rr * math.cos(ang), cy + rr * math.sin(ang)))
+    cv.fill_poly(pts, col)
+
+
 def art_summit(cv, x, y, w, h):
-    """Shenzhen at dusk: skyline, three flags, one round table."""
-    cv.fill_rect(x, y, w, h, NAVY2)
-    cv.fill_circle(x + w - 36, y + 30, 13, GOLD2)
-    # skyline silhouettes with lit windows
-    towers = [(0, 62, 34, 96), (36, 44, 30, 114), (68, 74, 36, 84),
-              (106, 34, 28, 124), (136, 58, 32, 100), (170, 70, 30, 88),
-              (202, 48, 30, 110), (234, 66, 32, 92), (268, 78, 26, 80)]
-    for (tx, th, tw, _hh) in towers:
-        top = y + h - 46 - th
-        cv.fill_rect(x + tx, top, tw, th + 46, NAVY)
-        for wy in range(top + 8, y + h - 50, 12):
-            for wx in range(x + tx + 5, x + tx + tw - 4, 9):
-                if (wx * 7 + wy * 13) % 5 < 2:
-                    cv.fill_rect(wx, wy, 3, 4, GOLD2)
-    # three flag poles
-    for i, fcol in enumerate((RED2, WHITE, BLUE)):
-        fx = x + w // 2 - 44 + i * 44
-        cv.fill_rect(fx, y + 22, 3, 62, GOLD)
-        cv.fill_rect(fx + 3, y + 24, 24, 15, fcol)
-        cv.rect(fx + 3, y + 24, 24, 15, MGREY)
-    # round table
-    cv.ellipse(x + w // 2, y + h - 16, 92, 14, BROWN)
-    cv.ellipse(x + w // 2, y + h - 20, 92, 12, (146, 104, 58))
-    for dx in (-58, 0, 58):
-        cv.fill_rect(x + w // 2 + dx - 12, y + h - 34, 24, 12, NAVY)
-        cv.fill_rect(x + w // 2 + dx - 12, y + h - 46, 24, 12, NAVY)
+    """The three leaders, standing before their flags — after the
+    reference photo: Trump (US), Xi (China), Putin (Russia)."""
+    SKIN = (232, 190, 150)
+    NAVY_SUIT = (28, 42, 78)
+    DARK = (30, 30, 30)
+    # panelled wall, warm brown like the reference backdrop
+    cv.fill_rect(x, y, w, h, (133, 96, 62))
+    for sx in range(0, w, 52):
+        cv.line(x + sx, y, x + sx, y + h, (110, 78, 48), 2)
+    centres = [x + w // 6, x + w // 2, x + 5 * w // 6]
+    # ---- flags behind each leader ----
+    # US flag: stripes + canton
+    fx0 = centres[0] - 48
+    for s in range(13):
+        if s % 2 == 0:
+            cv.fill_rect(fx0, y + s * 7, 96, 7, (178, 34, 52))
+    cv.fill_rect(fx0, y, 40, 49, (40, 60, 130))
+    for dy in range(6, 49, 10):
+        for dx in range(5, 40, 9):
+            cv.fill_circle(fx0 + dx, y + dy, 2, WHITE)
+    # China flag: red + five gold stars
+    fx1 = centres[1] - 48
+    cv.fill_rect(fx1, y, 96, 92, (222, 32, 32))
+    _star5(cv, fx1 + 20, y + 20, 10, (255, 210, 60))
+    for (sx, sy) in ((42, 12), (52, 22), (50, 34), (40, 40)):
+        _star5(cv, fx1 + sx, y + sy, 4, (255, 210, 60))
+    # Russia flag: white / blue / red bands
+    fx2 = centres[2] - 48
+    cv.fill_rect(fx2, y, 96, 31, WHITE)
+    cv.fill_rect(fx2, y + 31, 96, 31, (0, 70, 170))
+    cv.fill_rect(fx2, y + 62, 96, 30, (210, 30, 30))
+    # ---- three figures ----
+    leaders = [
+        ("TRUMP", (238, 205, 110), (200, 30, 40),
+         [( -25, -6), (-22, -22), (-8, -28), (8, -27), (20, -24),
+          (25, -12), (24, -5), (12, -14), (-6, -15), (-18, -12)]),
+        ("XI", (22, 22, 22), (40, 90, 180),
+         [(-26, -7), (-24, -21), (-10, -27), (10, -27), (24, -21),
+          (26, -7), (12, -13), (-12, -13)]),
+        ("PUTIN", (198, 182, 148), (140, 30, 40),
+         [(-25, -9), (-18, -22), (0, -25), (18, -22), (25, -9),
+          (10, -16), (-10, -16)]),
+    ]
+    for idx, (name, hair_col, tie_col, hair) in enumerate(leaders):
+        cx = centres[idx]
+        hy = y + 48
+        # neck, suit, shirt, tie
+        cv.fill_rect(cx - 9, y + 70, 18, 12, SKIN)
+        cv.fill_poly([(cx - 44, y + h - 16), (cx - 40, y + 80),
+                      (cx + 40, y + 80), (cx + 44, y + h - 16)],
+                     NAVY_SUIT)
+        cv.fill_poly([(cx - 13, y + 80), (cx + 13, y + 80),
+                      (cx, y + 104)], WHITE)
+        cv.fill_poly([(cx - 5, y + 82), (cx + 5, y + 82), (cx + 6, y + 98),
+                      (cx, y + 110), (cx - 6, y + 98)], tie_col)
+        # head, ears, hair, face
+        cv.ellipse(cx - 26, hy - 6, 8, 12, SKIN)
+        cv.ellipse(cx + 26, hy - 6, 8, 12, SKIN)
+        cv.ellipse(cx, hy, 26, 28, SKIN)
+        cv.fill_poly([(cx + dx, hy + dy) for (dx, dy) in hair], hair_col)
+        cv.fill_circle(cx - 9, hy - 2, 2, DARK)
+        cv.fill_circle(cx + 9, hy - 2, 2, DARK)
+        cv.line(cx - 13, hy - 9, cx - 5, hy - 10, DARK, 2)
+        cv.line(cx + 5, hy - 10, cx + 13, hy - 9, DARK, 2)
+        prev = None
+        for k in range(11):
+            dx = -10 + 2 * k
+            py = hy + 12 + (1 - (dx / 10.0) ** 2) * 5
+            pt = (cx + dx, int(py))
+            if prev is not None:
+                cv.line(prev[0], prev[1], pt[0], pt[1], (120, 70, 50), 2)
+            prev = pt
+    # name band
+    cv.fill_rect(x, y + h - 16, w, 16, NAVY)
+    for idx, (name, _hc, _tc, _hr) in enumerate(leaders):
+        cv.draw_text(centres[idx], y + h - 5, name, _bold(), 10, WHITE,
+                     align="center")
 
 
 def art_market(cv, x, y, w, h):
@@ -892,23 +963,21 @@ STATS = [
 ]
 
 LEADS = [
-    {"art": art_icj, "tag": "THE HAGUE · INTERNATIONAL LAW",
-     "title": "WORLD COURT: MYANMAR GUILTY OF GENOCIDE",
-     "deck": "The ICJ rules 9–6 that Myanmar committed genocide against "
-             "the Rohingya in 2017 — the first time a state has been held "
-             "responsible. Reparations ordered.",
-     "src": "Reuters · CNN · Le Monde — 19 Nov 2026"},
     {"art": art_summit, "tag": "SHENZHEN · DIPLOMACY",
      "title": "TRUMP, XI AND PUTIN END HISTORIC SUMMIT",
      "deck": "First-ever three-way talks run 90 minutes in Shenzhen; the "
              "leaders denounce nuclear war and APEC adopts the Shenzhen "
              "Outlook on trade, data and AI.",
      "src": "WSJ · USA Today · APEC — 19 Nov 2026"},
+    {"art": art_icj, "tag": "THE HAGUE · INTERNATIONAL LAW",
+     "title": "WORLD COURT: MYANMAR GUILTY OF GENOCIDE",
+     "deck": "The ICJ rules 9–6 that Myanmar committed genocide against "
+             "the Rohingya in 2017 — the first state ever held responsible.",
+     "src": "Reuters · CNN · Le Monde — 19 Nov 2026"},
     {"art": art_market, "tag": "NEW YORK · MARKETS",
      "title": "WALL STREET SLIDES AS AI BUST BITES",
      "deck": "S&P 500 −2.02%, a fifth straight loss; Nikkei −4.68% — even "
-             "as Anthropic's record $81.3bn IPO closes 17% above its "
-             "$83 price.",
+             "as Anthropic's record $81.3bn IPO closes 17% above its price.",
      "src": "Dow Jones · OneTurn — 19 Nov 2026"},
 ]
 
@@ -1009,10 +1078,11 @@ def render():
         cv.draw_text(bx + 12, 146, big, bold, 22, col)
         cv.draw_text(bx + 12, 164, label, reg, 10, INK)
 
-    # ---- three leads ----
+    # ---- three leads: summit first and widest ----
+    LEAD_WIDTHS = [380, 296, 276]
+    lx = 26
     for i, lead in enumerate(LEADS):
-        lx = 26 + i * 330
-        lw = 312
+        lw = LEAD_WIDTHS[i]
         lead["art"](cv, lx, 182, lw, 134)
         cv.rect(lx, 182, lw, 134, MGREY)
         cv.draw_text(lx, 336, lead["tag"], bold, 10, RED)
@@ -1020,11 +1090,12 @@ def render():
         for ln in cv.wrap(bold, lead["title"], 20, lw):
             cv.draw_text(lx, y, ln, bold, 20, NAVY)
             y += 24
-        y = 402
+        y += 6
         for ln in cv.wrap(reg, lead["deck"], 11.5, lw):
             cv.draw_text(lx, y, ln, reg, 11.5, INK)
-            y += 15
-        cv.draw_text(lx, 458, lead["src"], ital, 9, GREY)
+            y += 14
+        cv.draw_text(lx, y + 11, lead["src"], ital, 9, GREY)
+        lx += lw + 10
     cv.hline(26, 998, 470, NAVY, 2)
 
     # ---- medium grid: 4 x 2 ----
