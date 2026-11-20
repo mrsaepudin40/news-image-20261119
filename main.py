@@ -7,9 +7,10 @@ summing up the world news of Thursday 19 November 2026: 36 stories
 a world map with numbered pins, a four-number stat strip, a DATE CHECK
 box and a source footer. No network, no Pillow, deterministic output.
 
-The summit portrait is a cartoon reference image held in the repo as
-summit.png (380x118) and decoded at run time; every other picture and
-the map are drawn in code.
+The summit portrait (summit.png, 380x118) and the World Court
+portrait (icj.png, 296x134) are cartoon reference images held in the
+repo and decoded at run time; every other picture and the map are
+drawn in code.
 
 Every headline was re-verified against reports dated 19 November 2026
 before it was drawn; three stories that broke on Wednesday 18 November
@@ -643,36 +644,21 @@ def _tint(col, f=0.88):
     return tuple(int(255 - (255 - c) * f) for c in col)
 
 
+_ICJ_PHOTO = [None]
+
+
 def art_icj(cv, x, y, w, h):
-    """The Peace Palace and the scales of justice, The Hague."""
-    cv.fill_rect(x, y, w, h, SKY)
-    cv.fill_circle(x + w - 34, y + 26, 15, GOLD2)
-    # courthouse
-    bx, bw = x + 26, w - 52
-    base_y = y + h - 18
-    cv.fill_rect(bx, base_y, bw, 18, SAND)
-    cv.fill_rect(bx + 8, base_y - 8, bw - 16, 8, (210, 196, 168))
-    cv.fill_rect(bx + 14, base_y - 66, bw - 28, 58, PAPER)
-    cv.rect(bx + 14, base_y - 66, bw - 28, 58, MGREY)
-    for i in range(4):
-        cx0 = bx + 30 + i * ((bw - 60) // 3)
-        cv.fill_rect(cx0, base_y - 62, 10, 58, WHITE)
-        cv.rect(cx0, base_y - 62, 10, 58, MGREY)
-    cv.fill_poly([(bx + 10, base_y - 66), (bx + bw // 2, base_y - 96),
-                  (bx + bw - 10, base_y - 66)], NAVY)
-    cv.fill_circle(bx + bw // 2, base_y - 78, 7, GOLD2)
-    # scales of justice in front
-    cx = x + w // 2
-    sy = y + h - 34
-    cv.fill_rect(cx - 2, sy - 52, 4, 52, GOLD)
-    cv.fill_rect(cx - 34, sy - 52, 68, 4, GOLD)
-    cv.fill_circle(cx, sy - 54, 4, GOLD)
-    for dx in (-34, 34):
-        cv.line(cx + dx, sy - 48, cx + dx - 10, sy - 30, GOLD, 2)
-        cv.line(cx + dx, sy - 48, cx + dx + 10, sy - 30, GOLD, 2)
-        cv.fill_poly([(cx + dx - 12, sy - 30), (cx + dx + 12, sy - 30),
-                      (cx + dx, sy - 18)], GOLD2)
-    cv.fill_rect(cx - 14, sy, 28, 4, GOLD)
+    """The World Court lead portrait Bos chose: Rohingya people behind
+    a locked fence, held in the repo as icj.png (296x134) and decoded
+    at run time."""
+    if _ICJ_PHOTO[0] is None:
+        here = os.path.dirname(os.path.abspath(__file__))
+        _ICJ_PHOTO[0] = read_png_rgb(os.path.join(here, "icj.png"))
+    iw, ih, rgb = _ICJ_PHOTO[0]
+    if (iw, ih) != (w, h):
+        raise ValueError("icj.png is %dx%d, expected %dx%d"
+                         % (iw, ih, w, h))
+    cv.blit(x, y, iw, ih, rgb)
 
 
 _BOLD_CACHE = [None]
@@ -1085,8 +1071,8 @@ DATE_CHECK = ("DATE CHECK — Left out on purpose: the EU's €45bn Ukraine "
               "on this page is dated Thursday 19 November 2026.")
 
 FOOTER = ("Sources: Reuters, CNN, WSJ, USA Today, AP, UN News, ReliefWeb, "
-          "OneTurn, Dow Jones/Morningstar. Summit portrait: cartoon "
-          "reference image; the rest is drawn in code.")
+          "OneTurn, Dow Jones/Morningstar. Summit and World Court portraits "
+          "are cartoon reference images; the rest is drawn in code.")
 FOOTER2 = ("Contested claims are attributed. Figures as reported on "
            "Thursday 19 November 2026.")
 
