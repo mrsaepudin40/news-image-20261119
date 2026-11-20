@@ -877,7 +877,7 @@ def draw_map(cv, x, y, w, h, font_bold):
 # ================================================================ content
 # 36 stories, all dated Thursday 19 November 2026 and re-verified
 # against reports of that day before drawing. Region counts:
-# Europe 7, Americas 9, Asia-Pacific 8, Middle East 3, Africa 4,
+# Europe 7, Americas 8, Asia-Pacific 9, Middle East 3, Africa 4,
 # Oceania 3, World 2.
 
 REGION_COL = {"EUROPE": BLUE, "AMERICAS": RED2, "ASIA-PACIFIC": TEAL,
@@ -935,7 +935,7 @@ MEDIUMS = [
 
 ALSO = [
     "GTA VI out at midnight; NZ first, $79.99",
-    "COP31 draft: $120bn a year by 2035",
+    "COP31 draft drops fossil fuels, $120bn goal",
     "Cyclone Akvan nears Odisha; 50,000 moved",
     "South Florida floods after slow storm",
     "Migrant boat sinks off Senegal; dozens lost",
@@ -944,7 +944,7 @@ ALSO = [
     "Ethiopia–Eritrea troops mass near Badme",
     "Iraq orders Kataib Hezbollah out",
     "Pakistan: 22 militants killed in raids",
-    "Democrats nominate Jeffries for speaker",
+    "Seoul: Half a million sit entrance exam",
     "Trump pardons Pete Rose posthumously",
     "US in new Supreme Court bid over TPS",
     "US jobless claims unexpectedly rise",
@@ -996,7 +996,7 @@ def render():
     cv.hline(26, 998, 82, GOLD, 2)
     cv.fill_rect(26, 88, 972, 24, NAVY)
     cv.draw_text(W // 2, 105,
-                 "36 STORIES  ·  EUROPE 7  ·  AMERICAS 9  ·  ASIA-PACIFIC 8  ·  "
+                 "36 STORIES  ·  EUROPE 7  ·  AMERICAS 8  ·  ASIA-PACIFIC 9  ·  "
                  "MIDDLE EAST 3  ·  AFRICA 4  ·  OCEANIA 3  ·  WORLD 2",
                  bold, 12, WHITE, align="center")
 
