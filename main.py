@@ -4,8 +4,8 @@
 A pure-stdlib program that draws one 1024x1024 newspaper front page
 summing up the world news of Thursday 19 November 2026: 36 stories
 (3 illustrated leads, 10 pictured medium stories, 23 more in brief),
-a world map with numbered pins, a four-number stat strip, a DATE CHECK
-box and a source footer. No network, no Pillow, deterministic output.
+a world map with numbered pins, a calendar page in the masthead, a
+four-number stat strip, a DATE CHECK box and a source footer. No network, no Pillow, deterministic output.
 
 The summit portrait (summit.png, 380x214) and the World Court
 portrait (icj.png, 296x167) are cartoon reference images held in the
@@ -818,16 +818,26 @@ def icon_capitol(cv, x, y, s):
 
 
 def icon_truck(cv, x, y, s):
-    # aid truck: navy body on the pale tint, never white-on-pale
+    # detailed ambulance: white body with a thick navy outline so it
+    # reads on the pale tint, red cross, red stripe, light bar, blue
+    # windshield, wheels with white hubs
     cv.fill_rect(x, y, s, s, _tint(ORANGE))
-    cv.fill_rect(x + 8, y + 18, 30, 20, NAVY)
-    cv.rect(x + 8, y + 18, 30, 20, ORANGE)
-    cv.fill_rect(x + 38, y + 26, 12, 12, NAVY)
-    cv.rect(x + 38, y + 26, 12, 12, ORANGE)
+    cv.fill_rect(x + 12, y + 12, 8, 4, RED2)
+    cv.fill_rect(x + 22, y + 12, 8, 4, BLUE)
+    cv.fill_rect(x + 8, y + 16, 30, 22, WHITE)
+    cv.rect(x + 8, y + 16, 30, 22, NAVY, 2)
+    cv.fill_rect(x + 38, y + 24, 12, 14, WHITE)
+    cv.rect(x + 38, y + 24, 12, 14, NAVY, 2)
+    cv.fill_rect(x + 40, y + 26, 8, 6, (150, 200, 230))
+    cv.fill_rect(x + 20, y + 21, 4, 12, RED2)
+    cv.fill_rect(x + 16, y + 25, 12, 4, RED2)
+    cv.fill_rect(x + 8, y + 33, 30, 3, RED2)
+    cv.vline(x + 30, y + 18, y + 33, NAVY, 1)
+    cv.fill_rect(x + 48, y + 33, 2, 3, GOLD2)
     cv.fill_circle(x + 17, y + 42, 5, INK)
+    cv.fill_circle(x + 17, y + 42, 2, WHITE)
     cv.fill_circle(x + 43, y + 42, 5, INK)
-    cv.fill_rect(x + 19, y + 23, 8, 3, RED2)
-    cv.fill_rect(x + 21, y + 21, 3, 8, RED2)
+    cv.fill_circle(x + 43, y + 42, 2, WHITE)
 
 
 def icon_ships(cv, x, y, s):
@@ -1086,6 +1096,20 @@ MAP_KEY_2 = ("7 Copenhagen · 8 Pyongyang · 9 Port-au-Prince · 10 Dakar · "
 
 
 # ================================================================ layout
+def draw_calendar(cv, x, y, w, h, bold):
+    """A calendar page for Thursday 19 November 2026, in the masthead:
+    white page, navy day band, big date, red month line."""
+    cv.fill_rect(x, y, w, h, WHITE)
+    cv.rect(x, y, w, h, NAVY, 2)
+    cv.fill_rect(x, y, w, 16, NAVY)
+    cv.draw_text(x + w // 2, y + 12, "THU", bold, 10, WHITE, align="center")
+    cv.draw_text(x + w // 2, y + 44, "19", bold, 30, NAVY, align="center")
+    cv.draw_text(x + w // 2, y + 58, "NOV 2026", bold, 8.5, RED,
+                 align="center")
+    for rx in (x + 20, x + w - 20):
+        cv.fill_circle(rx, y, 3, GOLD2)
+
+
 def render():
     here = os.path.dirname(os.path.abspath(__file__))
     reg = Font(os.path.join(here, "LiberationSerif-Regular.ttf"))
@@ -1098,6 +1122,7 @@ def render():
 
     # ---- masthead: dark band, light text ----
     cv.fill_rect(0, 10, W, 108, NAVY)
+    draw_calendar(cv, 26, 16, 76, 62, bold)
     cv.draw_text(W // 2, 30, "THE WORLD IN ONE DAY", bold, 13, WHITE,
                  align="center", ls=2.0)
     cv.draw_text(W // 2, 74, "Thursday 19 November 2026", bold, 40, WHITE,
