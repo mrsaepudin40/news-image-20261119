@@ -3,9 +3,10 @@
 
 A pure-stdlib program that draws one 1024x1024 newspaper front page
 summing up the world news of Thursday 19 November 2026: 36 stories
-(3 illustrated leads, 10 pictured medium stories, 23 more in brief),
-a world map with numbered pins, a calendar page in the masthead, a
-four-number stat strip, a DATE CHECK box and a source footer. No network, no Pillow, deterministic output.
+(3 illustrated leads, 4 featured stories, 5 pictured medium stories,
+24 more in brief), a world map with numbered pins, a calendar page in
+the masthead, a seven-number stat strip, a DATE CHECK box and a source
+footer. No network, no Pillow, deterministic output.
 
 The three lead illustrations (summit.png, 296x167; icj.png, 328x185;
 market.png, 328x185) and the masthead calendar (calendar.png, 58x62)
@@ -992,10 +993,13 @@ REGION_COL = {"EUROPE": BLUE, "AMERICAS": RED2, "ASIA-PACIFIC": TEAL,
               "WORLD": GREY}
 
 STATS = [
-    ("-2.02%", "S&P 500 — fifth straight loss", RED),
-    ("$81.3bn", "Anthropic IPO, largest ever", TEAL),
-    ("9–6", "ICJ: Myanmar guilty of genocide", NAVY),
-    ("90 min", "First Trump–Xi–Putin talks", PURPLE),
+    ("-2.02%", "S&P 500, fifth loss", RED),
+    ("$81.3bn", "Anthropic IPO, largest", TEAL),
+    ("9–6", "ICJ: Myanmar guilty", NAVY),
+    ("90 min", "Trump–Xi–Putin talks", PURPLE),
+    ("13 yrs", "GTA VI wait ends", ORANGE),
+    ("$120bn", "COP31 goal dropped", BLUE),
+    ("109–0", "Denmark Arctic vote", GREEN),
 ]
 
 LEADS = [
@@ -1019,38 +1023,56 @@ LEADS = [
 
 MEDIUMS = [
     {"icon": "bridge", "region": "EUROPE", "place": "KERCH",
+     "data": "3RD TIME",
      "title": "Ukraine hits Kerch Bridge a third time"},
     {"icon": "capitol", "region": "AMERICAS", "place": "WASHINGTON",
+     "data": "51–48",
      "title": "Senate rejects Iran war-powers bid, 51–48"},
     {"icon": "truck", "region": "MIDDLE EAST", "place": "GAZA",
+     "data": "49 A DAY",
      "title": "Gaza aid grade 4 of 26; 49 trucks a day"},
-    {"icon": "ships", "region": "EUROPE", "place": "LONDON · OSLO",
-     "title": "UK, Norway pledge £100m+ for naval craft"},
-    {"icon": "ice", "region": "EUROPE", "place": "COPENHAGEN",
-     "title": "Denmark backs US–Greenland deal, 109–0"},
-    {"icon": "atom", "region": "ASIA-PACIFIC", "place": "VIENNA",
-     "title": "IAEA: North Korea expanded uranium enrichment"},
-    {"icon": "shield", "region": "AMERICAS", "place": "PORT-AU-PRINCE",
-     "title": "Haiti police kill 34 gang members in raid"},
-    {"icon": "parliament", "region": "ASIA-PACIFIC", "place": "JAKARTA",
-     "title": "Indonesia passes asset-forfeiture bill"},
     {"icon": "boat", "region": "AFRICA", "place": "DAKAR",
+     "data": "DOZENS MISSING",
      "title": "Boat capsizes off Senegal; dozens missing"},
     {"icon": "palm", "region": "OCEANIA", "place": "SUVA",
+     "data": "EL NIÑO",
      "title": "Fiji declares national disaster over El Niño"},
 ]
 
+# Four stories promoted from the also-list: the day's biggest pop
+# story (GTA VI), the climate draft, the cyclone and the Seoul exam.
+# Each gets a data banner, a headline, a deck and a source, the way
+# the day's best front pages feature them.
+FEATURED = [
+    {"banner": "GTA VI · 13 YEARS", "colour": PURPLE,
+     "title": "GTA VI out at midnight; NZ first in line",
+     "deck": "The sequel 13 years in the making goes on sale at midnight "
+             "— $79.99, New Zealand first.",
+     "src": "Rockstar · AP — 19 Nov 2026"},
+    {"banner": "COP31 · $120bn CUT", "colour": RED,
+     "title": "COP31 draft drops fossil fuels, $120bn goal",
+     "deck": "The Antalya draft drops fossil-fuel language and the $120bn "
+             "aid target; talks run to Friday.",
+     "src": "Reuters · CNN — 19 Nov 2026"},
+    {"banner": "AKVAN · 50,000 MOVED", "colour": BLUE,
+     "title": "Cyclone Akvan nears Odisha; 50,000 moved",
+     "deck": "India moves 50,000 people from the Odisha coast as the "
+             "cyclone closes in.",
+     "src": "Reuters — 19 Nov 2026"},
+    {"banner": "SUNEUNG · 500,000 SIT", "colour": TEAL,
+     "title": "Seoul: half a million sit entrance exam",
+     "deck": "Half a million students sit South Korea's Suneung college "
+             "exam — the year's biggest test.",
+     "src": "Reuters — 19 Nov 2026"},
+]
+
 ALSO = [
-    "GTA VI out at midnight; NZ first, $79.99",
-    "COP31 draft drops fossil fuels, $120bn goal",
-    "Cyclone Akvan nears Odisha; 50,000 moved",
     "South Florida floods after slow storm",
     "589m children lived in conflict zones",
     "Tanzania: Lissu convicted of sedition",
     "Ethiopia–Eritrea troops mass near Badme",
     "Iraq orders Kataib Hezbollah out",
     "Pakistan: 22 militants killed in raids",
-    "Seoul: Half a million sit entrance exam",
     "Trump pardons Pete Rose posthumously",
     "US in new Supreme Court bid over TPS",
     "US jobless claims unexpectedly rise",
@@ -1064,6 +1086,11 @@ ALSO = [
     "Brent near flat at $89.72; IEA warns",
     "South Africa holds repo rate at 7.25%",
     "Canada eases rules for smaller lenders",
+    "UK, Norway pledge £100m+ for naval craft",
+    "Denmark backs US–Greenland deal, 109–0",
+    "IAEA: North Korea expanded uranium enrichment",
+    "Haiti police kill 34 gang members in raid",
+    "Indonesia passes asset-forfeiture bill",
 ]
 
 DATE_CHECK = ("DATE CHECK — Left out on purpose: the EU's €45bn Ukraine "
@@ -1126,14 +1153,14 @@ def render():
                  "MIDDLE EAST 3  ·  AFRICA 4  ·  OCEANIA 3  ·  WORLD 2",
                  bold, 12, NAVY, align="center")
 
-    # ---- numbers strip ----
+    # ---- numbers strip: seven cells ----
     for i, (big, label, col) in enumerate(STATS):
-        bx = 26 + i * 245
-        cv.fill_rect(bx, 120, 237, 52, PAPER)
-        cv.rect(bx, 120, 237, 52, MGREY)
-        cv.fill_rect(bx, 120, 237, 3, col)
-        cv.draw_text(bx + 12, 146, big, bold, 22, col)
-        cv.draw_text(bx + 12, 164, label, reg, 10, INK)
+        bx = 26 + i * 139
+        cv.fill_rect(bx, 120, 131, 52, PAPER)
+        cv.rect(bx, 120, 131, 52, MGREY)
+        cv.fill_rect(bx, 120, 131, 3, col)
+        cv.draw_text(bx + 12, 146, big, bold, 19, col)
+        cv.draw_text(bx + 12, 164, label, reg, 9, INK)
 
     # ---- three leads: summit 296x167, the freed width shared by the
     # other two, all art 16:9 ----
@@ -1158,22 +1185,42 @@ def render():
         lx += lw + 10
     cv.hline(26, 998, 566, NAVY, 2)
 
-    # ---- medium grid: 5 x 2 ----
+    # ---- featured row: 4 promoted stories, data banner + deck ----
+    for i, feat in enumerate(FEATURED):
+        fx = 26 + i * 245
+        fy = 576
+        cv.fill_rect(fx, fy, 237, 84, PAPER)
+        cv.rect(fx, fy, 237, 84, MGREY)
+        cv.fill_rect(fx, fy, 237, 20, feat["colour"])
+        cv.draw_text(fx + 118, fy + 15, feat["banner"], bold, 10.5,
+                     WHITE, align="center")
+        y = fy + 27
+        for ln in cv.wrap(bold, feat["title"], 12, 221):
+            cv.draw_text(fx + 8, y, ln, bold, 12, NAVY)
+            y += 14
+        y = fy + 57
+        for ln in cv.wrap(reg, feat["deck"], 10, 221):
+            cv.draw_text(fx + 8, y, ln, reg, 10, INK)
+            y += 11
+        cv.draw_text(fx + 8, fy + 80, feat["src"], ital, 8, GREY)
+
+    # ---- medium grid: one row of 5, data chip + icon + title ----
     for idx, med in enumerate(MEDIUMS):
-        col, row = idx % 5, idx // 5
-        mx = 26 + col * 196
-        my = 576 + row * 90
+        mx = 26 + idx * 196
+        my = 666
         cv.fill_rect(mx, my, 186, 82, PAPER)
         cv.rect(mx, my, 186, 82, MGREY)
-        ICONS[med["icon"]](cv, mx + 6, my + 8, 62)
+        cv.fill_rect(mx, my, 186, 16, REGION_COL[med["region"]])
+        cv.draw_text(mx + 93, my + 12, med["data"], bold, 9.5, WHITE,
+                     align="center")
+        ICONS[med["icon"]](cv, mx + 6, my + 18, 62)
         tx = mx + 74
-        cv.draw_text(tx, my + 18, med["place"], bold, 8.5,
+        cv.draw_text(tx, my + 30, med["place"], bold, 8.5,
                      REGION_COL[med["region"]])
-        cv.draw_text(tx, my + 30, med["region"], bold, 8.5, GREY)
-        y = my + 46
+        y = my + 42
         for ln in cv.wrap(bold, med["title"], 11, 106):
             cv.draw_text(tx, y, ln, bold, 11, INK)
-            y += 14
+            y += 13
 
     # ---- map + also list ----
     cv.draw_text(26, 768, "WHERE IT HAPPENED", bold, 13, NAVY)
