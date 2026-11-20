@@ -8,9 +8,9 @@ a world map with numbered pins, a calendar page in the masthead, a
 four-number stat strip, a DATE CHECK box and a source footer. No network, no Pillow, deterministic output.
 
 The three lead illustrations (summit.png, 296x167; icj.png, 328x185;
-market.png, 328x185) are reference images Bos chose, held in the repo
-and decoded at run time; every other picture and the map are drawn in
-code. All three lead illustrations are 16:9.
+market.png, 328x185) and the masthead calendar (calendar.png, 58x62)
+are reference images Bos chose, held in the repo and decoded at run
+time; every other picture and the map are drawn in code.
 
 Every headline was re-verified against reports dated 19 November 2026
 before it was drawn; three stories that broke on Wednesday 18 November
@@ -1084,18 +1084,22 @@ MAP_KEY_2 = ("7 Copenhagen · 8 Pyongyang · 9 Port-au-Prince · 10 Dakar · "
 
 
 # ================================================================ layout
+_CALENDAR_PHOTO = [None]
+
+
 def draw_calendar(cv, x, y, w, h, bold):
-    """A calendar page for Thursday 19 November 2026, in the masthead:
-    white page, navy day band, big date, red month line."""
-    cv.fill_rect(x, y, w, h, WHITE)
-    cv.rect(x, y, w, h, NAVY, 2)
-    cv.fill_rect(x, y, w, 16, NAVY)
-    cv.draw_text(x + w // 2, y + 12, "THU", bold, 10, WHITE, align="center")
-    cv.draw_text(x + w // 2, y + 44, "19", bold, 30, NAVY, align="center")
-    cv.draw_text(x + w // 2, y + 58, "NOV 2026", bold, 8.5, RED,
-                 align="center")
-    for rx in (x + 20, x + w - 20):
-        cv.fill_circle(rx, y, 3, GOLD2)
+    """The masthead calendar Bos chose: a red-top page with NOVEMBER
+    and a big 19, held in the repo as calendar.png (58x62) and decoded
+    at run time; it is centred in the 76x62 slot."""
+    if _CALENDAR_PHOTO[0] is None:
+        here = os.path.dirname(os.path.abspath(__file__))
+        _CALENDAR_PHOTO[0] = read_png_rgb(os.path.join(here,
+                                                       "calendar.png"))
+    iw, ih, rgb = _CALENDAR_PHOTO[0]
+    if (iw, ih) != (58, 62):
+        raise ValueError("calendar.png is %dx%d, expected 58x62"
+                         % (iw, ih))
+    cv.blit(x + (w - iw) // 2, y, iw, ih, rgb)
 
 
 def render():
