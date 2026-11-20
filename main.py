@@ -7,8 +7,8 @@ summing up the world news of Thursday 19 November 2026: 36 stories
 a world map with numbered pins, a calendar page in the masthead, a
 four-number stat strip, a DATE CHECK box and a source footer. No network, no Pillow, deterministic output.
 
-The three lead illustrations (summit.png, 380x214; icj.png, 296x167;
-market.png, 276x155) are reference images Bos chose, held in the repo
+The three lead illustrations (summit.png, 296x167; icj.png, 328x185;
+market.png, 328x185) are reference images Bos chose, held in the repo
 and decoded at run time; every other picture and the map are drawn in
 code. All three lead illustrations are 16:9.
 
@@ -649,7 +649,7 @@ _ICJ_PHOTO = [None]
 
 def art_icj(cv, x, y, w, h):
     """The World Court lead portrait Bos chose: a Rohingya crowd, held
-    in the repo as icj.png (296x167) and decoded at run time."""
+    in the repo as icj.png (328x185) and decoded at run time."""
     if _ICJ_PHOTO[0] is None:
         here = os.path.dirname(os.path.abspath(__file__))
         _ICJ_PHOTO[0] = read_png_rgb(os.path.join(here, "icj.png"))
@@ -745,7 +745,7 @@ _SUMMIT_PHOTO = [None]
 def art_summit(cv, x, y, w, h):
     """The summit portrait Bos chose: the Simpsons-style cartoon of
     Putin, Xi and Trump laughing before their flags, held in the repo
-    as summit.png (380x214) and decoded at run time; the name band
+    as summit.png (296x167) and decoded at run time; the name band
     below is drawn in code, in the portrait's own left-to-right order
     (Putin, Xi, Trump)."""
     if _SUMMIT_PHOTO[0] is None:
@@ -770,7 +770,7 @@ _MARKET_PHOTO = [None]
 def art_market(cv, x, y, w, h):
     """The Wall Street lead chart Bos chose: red candles stepping down
     with the navy trend line falling away, held in the repo as
-    market.png (276x155) and decoded at run time."""
+    market.png (328x185) and decoded at run time."""
     if _MARKET_PHOTO[0] is None:
         here = os.path.dirname(os.path.abspath(__file__))
         _MARKET_PHOTO[0] = read_png_rgb(os.path.join(here, "market.png"))
@@ -1001,9 +1001,9 @@ STATS = [
 LEADS = [
     {"art": art_summit, "tag": "SHENZHEN · DIPLOMACY",
      "title": "TRUMP, XI AND PUTIN END HISTORIC SUMMIT",
-     "deck": "First-ever three-way talks run 90 minutes in Shenzhen; the "
+     "deck": "First three-way talks run 90 minutes in Shenzhen; the "
              "leaders denounce nuclear war and APEC adopts the Shenzhen "
-             "Outlook on trade, data and AI.",
+             "Outlook.",
      "src": "WSJ · USA Today · APEC — 19 Nov 2026"},
     {"art": art_icj, "tag": "THE HAGUE · INTERNATIONAL LAW",
      "title": "WORLD COURT: MYANMAR GUILTY OF GENOCIDE",
@@ -1131,9 +1131,10 @@ def render():
         cv.draw_text(bx + 12, 146, big, bold, 22, col)
         cv.draw_text(bx + 12, 164, label, reg, 10, INK)
 
-    # ---- three leads: summit first and widest, all art 16:9 ----
-    LEAD_WIDTHS = [380, 296, 276]
-    LEAD_HEIGHTS = [230, 167, 155]  # summit 380x214 + 16 name band
+    # ---- three leads: summit 296x167, the freed width shared by the
+    # other two, all art 16:9 ----
+    LEAD_WIDTHS = [296, 328, 328]
+    LEAD_HEIGHTS = [183, 185, 185]  # summit 296x167 + 16 name band
     lx = 26
     for i, lead in enumerate(LEADS):
         lw = LEAD_WIDTHS[i]
