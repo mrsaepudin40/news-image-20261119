@@ -764,29 +764,32 @@ def art_summit(cv, x, y, w, h):
 
 
 def art_market(cv, x, y, w, h):
-    """A falling market chart, with one green arrow fighting back."""
+    """A sell-off chart: red candles stepping down, volume building
+    toward the climax, and the navy trend line falling away."""
     cv.fill_rect(x, y, w, h, PAPER)
     for gy in range(y + 18, y + h - 14, 22):
         cv.hline(x + 10, x + w - 10, gy, LGREY)
-    # candlesticks stepping down
-    tops = [30, 44, 38, 58, 52, 72, 66, 88, 96]
-    for i, t in enumerate(tops):
-        cx0 = x + 16 + i * 30
+    # candlesticks stepping down, all red, with wicks
+    tops = [16, 26, 22, 36, 30, 46, 42, 56, 62]
+    heights = [22, 26, 20, 28, 24, 30, 26, 32, 28]
+    closes = []
+    for i, (t, bh) in enumerate(zip(tops, heights)):
+        cx0 = x + 14 + i * 28
         col = RED2 if i % 2 == 0 else RED
-        cv.fill_rect(cx0, y + t, 16, 34, col)
-        cv.vline(cx0 + 8, y + t - 8, y + t + 42, col, 2)
-    # falling line with arrowhead
-    pts = [(x + 14, y + 34), (x + 70, y + 52), (x + 130, y + 48),
-           (x + 190, y + 78), (x + 250, y + 92), (x + w - 16, y + 118)]
+        cv.fill_rect(cx0, y + t, 14, bh, col)
+        cv.vline(cx0 + 7, y + t - 6, y + t + bh + 8, col, 2)
+        closes.append((cx0 + 7, y + t + bh))
+    # falling trend line through the closes, running off down-right
+    pts = closes + [(x + w - 8, y + 112)]
     for a, b in zip(pts, pts[1:]):
-        cv.line(a[0], a[1], b[0], b[1], RED, 3)
+        cv.line(a[0], a[1], b[0], b[1], NAVY, 3)
     ex, ey = pts[-1]
-    cv.fill_poly([(ex, ey), (ex - 14, ey - 7), (ex - 14, ey + 7)], RED)
-    # green IPO arrow rising at the right
-    gx = x + w - 52
-    cv.fill_poly([(gx, y + h - 22), (gx + 12, y + h - 22), (gx + 12, y + 58),
-                  (gx + 24, y + 58), (gx + 6, y + 30), (gx - 12, y + 58),
-                  (gx, y + 58)], GREEN)
+    cv.fill_poly([(ex, ey), (ex - 4, ey - 13), (ex - 13, ey - 4)], NAVY)
+    # volume bars building toward the sell-off climax
+    vols = [8, 10, 9, 14, 12, 16, 15, 20, 24]
+    for i, v in enumerate(vols):
+        cv.fill_rect(x + 14 + i * 28, y + 126 - v, 14, v, (205, 130, 130))
+    cv.hline(x + 10, x + w - 10, y + 128, MGREY, 1)
 
 
 def icon_bridge(cv, x, y, s):
