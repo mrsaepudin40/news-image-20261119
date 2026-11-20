@@ -7,10 +7,10 @@ summing up the world news of Thursday 19 November 2026: 36 stories
 a world map with numbered pins, a four-number stat strip, a DATE CHECK
 box and a source footer. No network, no Pillow, deterministic output.
 
-The summit portrait (summit.png, 380x118) and the World Court
-portrait (icj.png, 296x134) are cartoon reference images held in the
+The summit portrait (summit.png, 380x214) and the World Court
+portrait (icj.png, 296x167) are cartoon reference images held in the
 repo and decoded at run time; every other picture and the map are
-drawn in code.
+drawn in code. All three lead illustrations are 16:9.
 
 Every headline was re-verified against reports dated 19 November 2026
 before it was drawn; three stories that broke on Wednesday 18 November
@@ -648,9 +648,8 @@ _ICJ_PHOTO = [None]
 
 
 def art_icj(cv, x, y, w, h):
-    """The World Court lead portrait Bos chose: Rohingya people behind
-    a locked fence, held in the repo as icj.png (296x134) and decoded
-    at run time."""
+    """The World Court lead portrait Bos chose: a Rohingya crowd, held
+    in the repo as icj.png (296x167) and decoded at run time."""
     if _ICJ_PHOTO[0] is None:
         here = os.path.dirname(os.path.abspath(__file__))
         _ICJ_PHOTO[0] = read_png_rgb(os.path.join(here, "icj.png"))
@@ -744,9 +743,11 @@ _SUMMIT_PHOTO = [None]
 
 
 def art_summit(cv, x, y, w, h):
-    """The summit portrait Bos chose: the cartoon of Trump, Xi and
-    Putin before their flags, held in the repo as summit.png (380x118)
-    and decoded at run time; the name band below is drawn in code."""
+    """The summit portrait Bos chose: the Simpsons-style cartoon of
+    Putin, Xi and Trump laughing before their flags, held in the repo
+    as summit.png (380x214) and decoded at run time; the name band
+    below is drawn in code, in the portrait's own left-to-right order
+    (Putin, Xi, Trump)."""
     if _SUMMIT_PHOTO[0] is None:
         here = os.path.dirname(os.path.abspath(__file__))
         _SUMMIT_PHOTO[0] = read_png_rgb(os.path.join(here, "summit.png"))
@@ -758,7 +759,7 @@ def art_summit(cv, x, y, w, h):
     # name band
     centres = [x + w // 6, x + w // 2, x + 5 * w // 6]
     cv.fill_rect(x, y + h - 16, w, 16, NAVY)
-    for idx, name in enumerate(("TRUMP", "XI", "PUTIN")):
+    for idx, name in enumerate(("PUTIN", "XI", "TRUMP")):
         cv.draw_text(centres[idx], y + h - 5, name, _bold(), 10, WHITE,
                      align="center")
 
@@ -780,7 +781,7 @@ def art_market(cv, x, y, w, h):
         cv.vline(cx0 + 7, y + t - 6, y + t + bh + 8, col, 2)
         closes.append((cx0 + 7, y + t + bh))
     # falling trend line through the closes, running off down-right
-    pts = closes + [(x + w - 8, y + 112)]
+    pts = closes + [(x + w - 8, y + 130)]
     for a, b in zip(pts, pts[1:]):
         cv.line(a[0], a[1], b[0], b[1], NAVY, 3)
     ex, ey = pts[-1]
@@ -788,8 +789,8 @@ def art_market(cv, x, y, w, h):
     # volume bars building toward the sell-off climax
     vols = [8, 10, 9, 14, 12, 16, 15, 20, 24]
     for i, v in enumerate(vols):
-        cv.fill_rect(x + 14 + i * 28, y + 126 - v, 14, v, (205, 130, 130))
-    cv.hline(x + 10, x + w - 10, y + 128, MGREY, 1)
+        cv.fill_rect(x + 14 + i * 28, y + 146 - v, 14, v, (205, 130, 130))
+    cv.hline(x + 10, x + w - 10, y + 148, MGREY, 1)
 
 
 def icon_bridge(cv, x, y, s):
@@ -1115,15 +1116,17 @@ def render():
         cv.draw_text(bx + 12, 146, big, bold, 22, col)
         cv.draw_text(bx + 12, 164, label, reg, 10, INK)
 
-    # ---- three leads: summit first and widest ----
+    # ---- three leads: summit first and widest, all art 16:9 ----
     LEAD_WIDTHS = [380, 296, 276]
+    LEAD_HEIGHTS = [230, 167, 155]  # summit 380x214 + 16 name band
     lx = 26
     for i, lead in enumerate(LEADS):
         lw = LEAD_WIDTHS[i]
-        lead["art"](cv, lx, 182, lw, 134)
-        cv.rect(lx, 182, lw, 134, MGREY)
-        cv.draw_text(lx, 336, lead["tag"], bold, 10, RED)
-        y = 360
+        lh = LEAD_HEIGHTS[i]
+        lead["art"](cv, lx, 182, lw, lh)
+        cv.rect(lx, 182, lw, lh, MGREY)
+        cv.draw_text(lx, 432, lead["tag"], bold, 10, RED)
+        y = 456
         for ln in cv.wrap(bold, lead["title"], 20, lw):
             cv.draw_text(lx, y, ln, bold, 20, NAVY)
             y += 24
@@ -1133,15 +1136,15 @@ def render():
             y += 14
         cv.draw_text(lx, y + 11, lead["src"], ital, 9, GREY)
         lx += lw + 10
-    cv.hline(26, 998, 470, NAVY, 2)
+    cv.hline(26, 998, 566, NAVY, 2)
 
     # ---- medium grid: 5 x 2 ----
     for idx, med in enumerate(MEDIUMS):
         col, row = idx % 5, idx // 5
         mx = 26 + col * 196
-        my = 480 + row * 108
-        cv.fill_rect(mx, my, 186, 100, PAPER)
-        cv.rect(mx, my, 186, 100, MGREY)
+        my = 576 + row * 90
+        cv.fill_rect(mx, my, 186, 82, PAPER)
+        cv.rect(mx, my, 186, 82, MGREY)
         ICONS[med["icon"]](cv, mx + 6, my + 8, 62)
         tx = mx + 74
         cv.draw_text(tx, my + 18, med["place"], bold, 8.5,
@@ -1153,25 +1156,25 @@ def render():
             y += 14
 
     # ---- map + also list ----
-    cv.draw_text(26, 716, "WHERE IT HAPPENED", bold, 13, NAVY)
-    cv.draw_text(512, 716, "ALSO ON THURSDAY 19 NOVEMBER", bold, 13, NAVY)
-    cv.hline(26, 998, 722, NAVY, 1)
-    draw_map(cv, 26, 730, 470, 148, bold)
-    cv.rect(26, 730, 470, 148, MGREY)
-    cv.draw_text(26, 886, MAP_KEY_1, reg, 8.5, GREY)
-    cv.draw_text(26, 898, MAP_KEY_2, reg, 8.5, GREY)
+    cv.draw_text(26, 768, "WHERE IT HAPPENED", bold, 13, NAVY)
+    cv.draw_text(512, 768, "ALSO ON THURSDAY 19 NOVEMBER", bold, 13, NAVY)
+    cv.hline(26, 998, 774, NAVY, 1)
+    draw_map(cv, 26, 782, 470, 100, bold)
+    cv.rect(26, 782, 470, 100, MGREY)
+    cv.draw_text(26, 890, MAP_KEY_1, reg, 8.5, GREY)
+    cv.draw_text(26, 902, MAP_KEY_2, reg, 8.5, GREY)
     for j, item in enumerate(ALSO):
         col, k = (0, j) if j < 12 else (1, j - 12)
         ax = 512 + col * 246
-        ay = 744 + k * 13
+        ay = 782 + k * 12
         cv.draw_text(ax, ay, "%d." % (j + 1), bold, 10, RED)
         cv.draw_text(ax + 20, ay, item, reg, 10, INK)
 
     # ---- date check ----
-    cv.fill_rect(26, 924, 972, 48, PAPER)
-    cv.rect(26, 924, 972, 48, MGREY)
-    cv.fill_rect(26, 924, 5, 48, RED)
-    y = 940
+    cv.fill_rect(26, 928, 972, 48, PAPER)
+    cv.rect(26, 928, 972, 48, MGREY)
+    cv.fill_rect(26, 928, 5, 48, RED)
+    y = 944
     for ln in cv.wrap(reg, DATE_CHECK, 11, 940):
         if ln.startswith("DATE CHECK"):
             cv.draw_text(42, y, "DATE CHECK", bold, 11, RED)
