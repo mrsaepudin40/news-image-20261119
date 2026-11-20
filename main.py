@@ -960,26 +960,64 @@ PINS = [
 ]
 
 
+def _inside_poly(px_, py_, poly):
+    # Ray casting: is point (px_, py_) inside polygon poly?
+    inside = False
+    n = len(poly)
+    for i in range(n):
+        x1, y1 = poly[i]
+        x2, y2 = poly[(i + 1) % n]
+        if (y1 > py_) != (y2 > py_):
+            xi = (py_ - y1) * (x2 - x1) / (y2 - y1) + x1
+            if px_ < xi:
+                inside = not inside
+    return inside
+
+
 def draw_map(cv, x, y, w, h, font_bold):
-    cv.fill_rect(x, y, w, h, (232, 240, 244))
+    # Futuristic HUD map: dark navy panel, faint graticule, continents
+    # as a gold dot matrix, pins as small numbered badges. The old flat
+    # grey continents made coastal pins (New York, Dakar, Gaza) look
+    # half-sunk in the ocean; smaller pins + soft dotted coasts fix that.
+    cv.fill_rect(x, y, w, h, NAVY)
     def px(lon, lat):
         return (x + 6 + (lon + 180) / 360.0 * (w - 12),
                 y + 4 + (75 - lat) / 135.0 * (h - 12))
-    for poly in CONTINENTS:
-        cv.fill_poly([px(lon, lat) for (lon, lat) in poly], (203, 206, 190))
-    # Europe's pins sit within a few pixels of each other at this scale,
-    # so three of them are nudged outward with a leader line to the true spot.
-    NUDGE = {1: (-13, 9), 6: (-11, -13), 7: (13, -7)}
+    # graticule every 30 degrees, faint on the dark panel
+    for lon in range(-150, 181, 30):
+        gx, _ = px(lon, 0)
+        cv.line(int(gx), y, int(gx), y + h, (35, 65, 105), 1)
+    for lat in (-60, -30, 0, 30, 60):
+        _, gy = px(0, lat)
+        cv.line(x, int(gy), x + w, int(gy), (35, 65, 105), 1)
+    # dot-matrix continents: 4 degrees lon, 8 degrees lat sampling,
+    # which is ~5px both ways at this panel size
+    lon = -178
+    while lon <= 178:
+        lat = -56
+        while lat <= 72:
+            if any(_inside_poly(lon, lat, poly) for poly in CONTINENTS):
+                dx, dy = px(lon, lat)
+                cv.fill_circle(int(dx), int(dy), 2, GOLD2)
+            lat += 8
+        lon += 4
+    # Several pins sit within a few pixels of each other at this scale
+    # (Europe 1/6/7, New York 3 vs Port-au-Prince 9, Kerch 4 vs Gaza 5,
+    # Pyongyang 8 vs Shenzhen 2, Jakarta 11 vs Shenzhen 2), so they are
+    # nudged outward with a leader line to the true spot.
+    NUDGE = {1: (-16, 14), 3: (-14, -6), 5: (10, 10), 6: (-16, 0),
+             7: (16, -2), 8: (8, -8), 11: (0, 8)}
     for (num, lon, lat) in PINS:
         tx, ty = px(lon, lat)
         dx, dy = NUDGE.get(num, (0, 0))
         px0, py0 = int(tx + dx), int(ty + dy)
         if (dx, dy) != (0, 0):
-            cv.fill_circle(int(tx), int(ty), 2, RED)
-            cv.line(int(tx), int(ty), px0, py0, RED, 1)
-        cv.fill_circle(px0, py0, 8, RED)
-        cv.circle(px0, py0, 8, WHITE, 1)
-        cv.draw_text(px0, py0 + 3, str(num), font_bold, 9, WHITE,
+            cv.fill_circle(int(tx), int(ty), 2, RED2)
+            cv.line(int(tx), int(ty), px0, py0, GOLD2, 1)
+        cv.circle(px0, py0, 9, RED2, 1)
+        cv.fill_circle(px0, py0, 6, RED)
+        cv.circle(px0, py0, 6, WHITE, 1)
+        cv.draw_text(px0, py0 + 3, str(num), font_bold, 8, WHITE,
                      align="center")
 
 # ================================================================ content
@@ -1227,7 +1265,7 @@ def render():
     cv.draw_text(512, 768, "ALSO ON THURSDAY 19 NOVEMBER", bold, 13, NAVY)
     cv.hline(26, 998, 774, NAVY, 1)
     draw_map(cv, 26, 782, 470, 100, bold)
-    cv.rect(26, 782, 470, 100, MGREY)
+    cv.rect(26, 782, 470, 100, GOLD, 2)
     cv.draw_text(26, 890, MAP_KEY_1, reg, 8.5, GREY)
     cv.draw_text(26, 902, MAP_KEY_2, reg, 8.5, GREY)
     for j, item in enumerate(ALSO):
