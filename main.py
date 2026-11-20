@@ -7,10 +7,10 @@ summing up the world news of Thursday 19 November 2026: 36 stories
 a world map with numbered pins, a calendar page in the masthead, a
 four-number stat strip, a DATE CHECK box and a source footer. No network, no Pillow, deterministic output.
 
-The summit portrait (summit.png, 380x214) and the World Court
-portrait (icj.png, 296x167) are cartoon reference images held in the
-repo and decoded at run time; every other picture and the map are
-drawn in code. All three lead illustrations are 16:9.
+The three lead illustrations (summit.png, 380x214; icj.png, 296x167;
+market.png, 276x155) are reference images Bos chose, held in the repo
+and decoded at run time; every other picture and the map are drawn in
+code. All three lead illustrations are 16:9.
 
 Every headline was re-verified against reports dated 19 November 2026
 before it was drawn; three stories that broke on Wednesday 18 November
@@ -764,33 +764,21 @@ def art_summit(cv, x, y, w, h):
                      align="center")
 
 
+_MARKET_PHOTO = [None]
+
+
 def art_market(cv, x, y, w, h):
-    """A sell-off chart: red candles stepping down, volume building
-    toward the climax, and the navy trend line falling away."""
-    cv.fill_rect(x, y, w, h, PAPER)
-    for gy in range(y + 18, y + h - 14, 22):
-        cv.hline(x + 10, x + w - 10, gy, LGREY)
-    # candlesticks stepping down, all red, with wicks
-    tops = [16, 26, 22, 36, 30, 46, 42, 56, 62]
-    heights = [22, 26, 20, 28, 24, 30, 26, 32, 28]
-    closes = []
-    for i, (t, bh) in enumerate(zip(tops, heights)):
-        cx0 = x + 14 + i * 28
-        col = RED2 if i % 2 == 0 else RED
-        cv.fill_rect(cx0, y + t, 14, bh, col)
-        cv.vline(cx0 + 7, y + t - 6, y + t + bh + 8, col, 2)
-        closes.append((cx0 + 7, y + t + bh))
-    # falling trend line through the closes, running off down-right
-    pts = closes + [(x + w - 8, y + 130)]
-    for a, b in zip(pts, pts[1:]):
-        cv.line(a[0], a[1], b[0], b[1], NAVY, 3)
-    ex, ey = pts[-1]
-    cv.fill_poly([(ex, ey), (ex - 4, ey - 13), (ex - 13, ey - 4)], NAVY)
-    # volume bars building toward the sell-off climax
-    vols = [8, 10, 9, 14, 12, 16, 15, 20, 24]
-    for i, v in enumerate(vols):
-        cv.fill_rect(x + 14 + i * 28, y + 146 - v, 14, v, (205, 130, 130))
-    cv.hline(x + 10, x + w - 10, y + 148, MGREY, 1)
+    """The Wall Street lead chart Bos chose: red candles stepping down
+    with the navy trend line falling away, held in the repo as
+    market.png (276x155) and decoded at run time."""
+    if _MARKET_PHOTO[0] is None:
+        here = os.path.dirname(os.path.abspath(__file__))
+        _MARKET_PHOTO[0] = read_png_rgb(os.path.join(here, "market.png"))
+    iw, ih, rgb = _MARKET_PHOTO[0]
+    if (iw, ih) != (w, h):
+        raise ValueError("market.png is %dx%d, expected %dx%d"
+                         % (iw, ih, w, h))
+    cv.blit(x, y, iw, ih, rgb)
 
 
 def icon_bridge(cv, x, y, s):
@@ -1085,8 +1073,8 @@ DATE_CHECK = ("DATE CHECK — Left out on purpose: the EU's €45bn Ukraine "
               "on this page is dated Thursday 19 November 2026.")
 
 FOOTER = ("Sources: Reuters, CNN, WSJ, USA Today, AP, UN News, ReliefWeb, "
-          "OneTurn, Dow Jones/Morningstar. Summit and World Court portraits "
-          "are cartoon reference images; the rest is drawn in code.")
+          "OneTurn, Dow Jones/Morningstar. Summit, World Court and market "
+          "illustrations are reference images; the rest is drawn in code.")
 FOOTER2 = ("Contested claims are attributed. Figures as reported on "
            "Thursday 19 November 2026.")
 
