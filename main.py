@@ -3,7 +3,7 @@
 
 A pure-stdlib program that draws one 1024x1024 newspaper front page
 summing up the world news of Thursday 19 November 2026: 36 stories
-(3 illustrated leads, 10 pictured medium stories, 23 more in brief),
+(3 illustrated leads, 12 pictured medium stories, 21 more in brief),
 a world map with numbered pins, a four-number stat strip, a DATE CHECK
 box and a source footer. No network, no Pillow, deterministic output.
 
@@ -905,10 +905,33 @@ def icon_palm(cv, x, y, s):
         cv.hline(x + 6, x + s - 6, y + wy, BLUE, 2)
 
 
+def icon_gavel(cv, x, y, s):
+    cv.fill_rect(x, y, s, s, _tint(GOLD))
+    cv.fill_rect(x + 11, y + 13, 40, 13, (96, 64, 32))
+    cv.fill_rect(x + 11, y + 13, 40, 3, (120, 84, 44))
+    cv.line(x + 31, y + 26, x + 24, y + 48, (96, 64, 32), 5)
+    cv.fill_rect(x + 14, y + 48, 34, 6, (96, 64, 32))
+
+
+def icon_baseball(cv, x, y, s):
+    cv.fill_rect(x, y, s, s, _tint(TEAL))
+    cx, cy = x + s // 2, y + s // 2
+    cv.fill_circle(cx, cy, 21, MGREY)
+    cv.fill_circle(cx, cy, 20, WHITE)
+    for pts in ([(cx - 15, cy - 13), (cx - 11, cy - 6), (cx - 10, cy),
+                 (cx - 11, cy + 6), (cx - 15, cy + 13)],
+                [(cx + 15, cy - 13), (cx + 11, cy - 6), (cx + 10, cy),
+                 (cx + 11, cy + 6), (cx + 15, cy + 13)]):
+        for i in range(len(pts) - 1):
+            cv.line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1],
+                    RED2, 2)
+
+
 ICONS = {"bridge": icon_bridge, "capitol": icon_capitol, "truck": icon_truck,
          "ships": icon_ships, "ice": icon_ice, "atom": icon_atom,
          "shield": icon_shield, "parliament": icon_parliament,
-         "boat": icon_boat, "palm": icon_palm}
+         "boat": icon_boat, "palm": icon_palm, "gavel": icon_gavel,
+         "baseball": icon_baseball}
 
 # ================================================================ map
 CONTINENTS = [
@@ -1036,6 +1059,10 @@ MEDIUMS = [
      "title": "Migrant boat capsizes off Senegal; dozens missing"},
     {"icon": "palm", "region": "OCEANIA", "place": "SUVA",
      "title": "Fiji declares national disaster over El Niño"},
+    {"icon": "gavel", "region": "AFRICA", "place": "DODOMA",
+     "title": "Lissu convicted of sedition in Tanzania"},
+    {"icon": "baseball", "region": "AMERICAS", "place": "WASHINGTON",
+     "title": "Trump pardons Pete Rose posthumously"},
 ]
 
 ALSO = [
@@ -1044,12 +1071,10 @@ ALSO = [
     "Cyclone Akvan nears Odisha; 50,000 moved",
     "South Florida floods after slow storm",
     "589m children lived in conflict zones",
-    "Tanzania: Lissu convicted of sedition",
     "Ethiopia–Eritrea troops mass near Badme",
     "Iraq orders Kataib Hezbollah out",
     "Pakistan: 22 militants killed in raids",
     "Seoul: Half a million sit entrance exam",
-    "Trump pardons Pete Rose posthumously",
     "US in new Supreme Court bid over TPS",
     "US jobless claims unexpectedly rise",
     "Australia jobless rate highest since 2021",
