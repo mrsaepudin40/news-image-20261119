@@ -3,7 +3,7 @@
 
 A pure-stdlib program that draws one 1024x1024 newspaper front page
 summing up the world news of Thursday 19 November 2026: 36 stories
-(3 illustrated leads, 12 pictured medium stories, 21 more in brief),
+(3 illustrated leads, 10 pictured medium stories, 23 more in brief),
 a world map with numbered pins, a four-number stat strip, a DATE CHECK
 box and a source footer. No network, no Pillow, deterministic output.
 
@@ -905,33 +905,10 @@ def icon_palm(cv, x, y, s):
         cv.hline(x + 6, x + s - 6, y + wy, BLUE, 2)
 
 
-def icon_gavel(cv, x, y, s):
-    cv.fill_rect(x, y, s, s, _tint(GOLD))
-    cv.fill_rect(x + 11, y + 13, 40, 13, (96, 64, 32))
-    cv.fill_rect(x + 11, y + 13, 40, 3, (120, 84, 44))
-    cv.line(x + 31, y + 26, x + 24, y + 48, (96, 64, 32), 5)
-    cv.fill_rect(x + 14, y + 48, 34, 6, (96, 64, 32))
-
-
-def icon_baseball(cv, x, y, s):
-    cv.fill_rect(x, y, s, s, _tint(TEAL))
-    cx, cy = x + s // 2, y + s // 2
-    cv.fill_circle(cx, cy, 21, MGREY)
-    cv.fill_circle(cx, cy, 20, WHITE)
-    for pts in ([(cx - 15, cy - 13), (cx - 11, cy - 6), (cx - 10, cy),
-                 (cx - 11, cy + 6), (cx - 15, cy + 13)],
-                [(cx + 15, cy - 13), (cx + 11, cy - 6), (cx + 10, cy),
-                 (cx + 11, cy + 6), (cx + 15, cy + 13)]):
-        for i in range(len(pts) - 1):
-            cv.line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1],
-                    RED2, 2)
-
-
 ICONS = {"bridge": icon_bridge, "capitol": icon_capitol, "truck": icon_truck,
          "ships": icon_ships, "ice": icon_ice, "atom": icon_atom,
          "shield": icon_shield, "parliament": icon_parliament,
-         "boat": icon_boat, "palm": icon_palm, "gavel": icon_gavel,
-         "baseball": icon_baseball}
+         "boat": icon_boat, "palm": icon_palm}
 
 # ================================================================ map
 CONTINENTS = [
@@ -1038,31 +1015,25 @@ LEADS = [
 
 MEDIUMS = [
     {"icon": "bridge", "region": "EUROPE", "place": "KERCH",
-     "title": "Ukraine hits Kerch Bridge a third time in four days; "
-              "Putin vows a harsher reply"},
+     "title": "Ukraine hits Kerch Bridge a third time"},
     {"icon": "capitol", "region": "AMERICAS", "place": "WASHINGTON",
      "title": "Senate rejects Iran war-powers bid, 51–48"},
     {"icon": "truck", "region": "MIDDLE EAST", "place": "GAZA",
-     "title": "Aid groups grade Gaza peace plan 4 out of 26; only 49 "
-              "trucks a day vs 600"},
+     "title": "Gaza aid grade 4 of 26; 49 trucks a day"},
     {"icon": "ships", "region": "EUROPE", "place": "LONDON · OSLO",
-     "title": "UK and Norway pledge £100m+ for two Ukrainian naval craft"},
+     "title": "UK, Norway pledge £100m+ for naval craft"},
     {"icon": "ice", "region": "EUROPE", "place": "COPENHAGEN",
-     "title": "Denmark backs US–Greenland security deal, 109–0"},
+     "title": "Denmark backs US–Greenland deal, 109–0"},
     {"icon": "atom", "region": "ASIA-PACIFIC", "place": "VIENNA",
      "title": "IAEA: North Korea expanded uranium enrichment"},
     {"icon": "shield", "region": "AMERICAS", "place": "PORT-AU-PRINCE",
-     "title": "Haitian police kill 34 gang members in raid to retake corridor"},
+     "title": "Haiti police kill 34 gang members in raid"},
     {"icon": "parliament", "region": "ASIA-PACIFIC", "place": "JAKARTA",
-     "title": "Indonesia's parliament passes asset-forfeiture bill"},
+     "title": "Indonesia passes asset-forfeiture bill"},
     {"icon": "boat", "region": "AFRICA", "place": "DAKAR",
-     "title": "Migrant boat capsizes off Senegal; dozens missing"},
+     "title": "Boat capsizes off Senegal; dozens missing"},
     {"icon": "palm", "region": "OCEANIA", "place": "SUVA",
      "title": "Fiji declares national disaster over El Niño"},
-    {"icon": "gavel", "region": "AFRICA", "place": "DODOMA",
-     "title": "Lissu convicted of sedition in Tanzania"},
-    {"icon": "baseball", "region": "AMERICAS", "place": "WASHINGTON",
-     "title": "Trump pardons Pete Rose posthumously"},
 ]
 
 ALSO = [
@@ -1071,10 +1042,12 @@ ALSO = [
     "Cyclone Akvan nears Odisha; 50,000 moved",
     "South Florida floods after slow storm",
     "589m children lived in conflict zones",
+    "Tanzania: Lissu convicted of sedition",
     "Ethiopia–Eritrea troops mass near Badme",
     "Iraq orders Kataib Hezbollah out",
     "Pakistan: 22 militants killed in raids",
     "Seoul: Half a million sit entrance exam",
+    "Trump pardons Pete Rose posthumously",
     "US in new Supreme Court bid over TPS",
     "US jobless claims unexpectedly rise",
     "Australia jobless rate highest since 2021",
@@ -1159,35 +1132,35 @@ def render():
         lx += lw + 10
     cv.hline(26, 998, 470, NAVY, 2)
 
-    # ---- medium grid: 4 x 3, last row 2 ----
+    # ---- medium grid: 5 x 2 ----
     for idx, med in enumerate(MEDIUMS):
-        col, row = idx % 4, idx // 4
-        mx = 26 + col * 245
-        my = 480 + row * 88
-        cv.fill_rect(mx, my, 237, 80, PAPER)
-        cv.rect(mx, my, 237, 80, MGREY)
-        ICONS[med["icon"]](cv, mx + 8, my + 11, 62)
-        tx = mx + 78
-        cv.draw_text(tx, my + 20, med["place"], bold, 8.5,
+        col, row = idx % 5, idx // 5
+        mx = 26 + col * 196
+        my = 480 + row * 108
+        cv.fill_rect(mx, my, 186, 100, PAPER)
+        cv.rect(mx, my, 186, 100, MGREY)
+        ICONS[med["icon"]](cv, mx + 6, my + 8, 62)
+        tx = mx + 74
+        cv.draw_text(tx, my + 18, med["place"], bold, 8.5,
                      REGION_COL[med["region"]])
-        cv.draw_text(tx, my + 32, med["region"], bold, 8.5, GREY)
-        y = my + 48
-        for ln in cv.wrap(bold, med["title"], 11, 151):
+        cv.draw_text(tx, my + 30, med["region"], bold, 8.5, GREY)
+        y = my + 46
+        for ln in cv.wrap(bold, med["title"], 11, 106):
             cv.draw_text(tx, y, ln, bold, 11, INK)
             y += 14
 
     # ---- map + also list ----
-    cv.draw_text(26, 746, "WHERE IT HAPPENED", bold, 13, NAVY)
-    cv.draw_text(512, 746, "ALSO ON THURSDAY 19 NOVEMBER", bold, 13, NAVY)
-    cv.hline(26, 998, 752, NAVY, 1)
-    draw_map(cv, 26, 760, 470, 118, bold)
-    cv.rect(26, 760, 470, 118, MGREY)
+    cv.draw_text(26, 716, "WHERE IT HAPPENED", bold, 13, NAVY)
+    cv.draw_text(512, 716, "ALSO ON THURSDAY 19 NOVEMBER", bold, 13, NAVY)
+    cv.hline(26, 998, 722, NAVY, 1)
+    draw_map(cv, 26, 730, 470, 148, bold)
+    cv.rect(26, 730, 470, 148, MGREY)
     cv.draw_text(26, 886, MAP_KEY_1, reg, 8.5, GREY)
     cv.draw_text(26, 898, MAP_KEY_2, reg, 8.5, GREY)
     for j, item in enumerate(ALSO):
         col, k = (0, j) if j < 12 else (1, j - 12)
         ax = 512 + col * 246
-        ay = 774 + k * 13
+        ay = 744 + k * 13
         cv.draw_text(ax, ay, "%d." % (j + 1), bold, 10, RED)
         cv.draw_text(ax + 20, ay, item, reg, 10, INK)
 
