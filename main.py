@@ -818,10 +818,11 @@ def icon_capitol(cv, x, y, s):
 
 
 def icon_truck(cv, x, y, s):
+    # aid truck: navy body on the pale tint, never white-on-pale
     cv.fill_rect(x, y, s, s, _tint(ORANGE))
-    cv.fill_rect(x + 8, y + 18, 30, 20, WHITE)
+    cv.fill_rect(x + 8, y + 18, 30, 20, NAVY)
     cv.rect(x + 8, y + 18, 30, 20, ORANGE)
-    cv.fill_rect(x + 38, y + 26, 12, 12, WHITE)
+    cv.fill_rect(x + 38, y + 26, 12, 12, NAVY)
     cv.rect(x + 38, y + 26, 12, 12, ORANGE)
     cv.fill_circle(x + 17, y + 42, 5, INK)
     cv.fill_circle(x + 43, y + 42, 5, INK)
@@ -842,9 +843,10 @@ def icon_ships(cv, x, y, s):
 
 
 def icon_ice(cv, x, y, s):
+    # icebergs: navy + blue on the pale tint, never white-on-pale
     cv.fill_rect(x, y, s, s, _tint(TEAL))
-    cv.fill_poly([(x + 8, y + 44), (x + 22, y + 16), (x + 36, y + 44)], WHITE)
-    cv.fill_poly([(x + 28, y + 44), (x + 44, y + 22), (x + 54, y + 44)], (210, 230, 240))
+    cv.fill_poly([(x + 8, y + 44), (x + 22, y + 16), (x + 36, y + 44)], NAVY)
+    cv.fill_poly([(x + 28, y + 44), (x + 44, y + 22), (x + 54, y + 44)], BLUE)
     cv.hline(x + 6, x + s - 6, y + 46, BLUE, 2)
     cv.fill_rect(x + 44, y + 8, 2, 16, NAVY)
     cv.fill_rect(x + 46, y + 8, 10, 7, RED2)
@@ -853,8 +855,8 @@ def icon_ice(cv, x, y, s):
 def icon_atom(cv, x, y, s):
     cv.fill_rect(x, y, s, s, _tint(PURPLE))
     cx, cy = x + s // 2, y + s // 2
-    cv.circle(cx, cy, 16, PURPLE, 2)
-    cv.circle(cx, cy, 11, PURPLE, 2)
+    cv.circle(cx, cy, 16, PURPLE, 3)
+    cv.circle(cx, cy, 11, PURPLE, 3)
     cv.fill_circle(cx, cy, 5, RED2)
     for (dx, dy) in ((-14, -10), (14, -10), (0, 15)):
         cv.fill_circle(cx + dx, cy + dy, 3, BLUE)
